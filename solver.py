@@ -15,7 +15,7 @@ from concurrent.futures import ProcessPoolExecutor
 
 # File paths
 swap_plan_path = "cycles.txt" # This txt will contain the translation of the cube into cycles needed to solve it (in this case the non-diag centers)
-table_path = "full_table_except_one_case.txt" # This is the table of cycles -> commutators
+table_path = "table.txt" # This is the table of cycles -> commutators
 output_path = "solution.txt" # output file
 
 
@@ -664,7 +664,7 @@ def process_algorithms(input_path, m, output_path):
     qapp.quit()
 
 if __name__ == '__main__':
-    M = 20 # Radius of the cube. Not diameter
+    M = 50 # Radius of the cube. Not diameter
     app.use_app('pyqt5')
     qapp = QtWidgets.QApplication(sys.argv)
     win = CubeGridApp(M, cell_size=1)
