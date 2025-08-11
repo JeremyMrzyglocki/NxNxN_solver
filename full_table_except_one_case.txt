@@ -34,10 +34,10 @@
 1,3,18  algorithm: [2F' 3U' 2F, U2]
 1,3,19  algorithm: B2 [U2,3L 2U2 3L'] B2
 1,3,20  algorithm: B [U2,3L 2U2 3L'] B'
-1,3,21  algorithm: 
-1,3,22  algorithm: 
-1,3,23  algorithm: 
-1,3,24  algorithm: 
+1,3,21  algorithm: 3R' F' [U 2R U',3L2] F 3R
+1,3,22  algorithm: 3R' F2 [F 2R F',3L] F2 3R
+1,3,23  algorithm: 3L U2 [2B2, D' 3L' D] U2 3L'
+1,3,24  algorithm: 3R' F2 [F' 2L' F,3L] F2 3R
 1,4,5  algorithm: [3F 2U2 3F',U']
 1,4,6  algorithm: [2L' 3U 2L,U']
 1,4,7  algorithm: [L 2B L', 3F']
@@ -117,7 +117,7 @@
 1,8,11  algorithm: [3D F 3D',2B]
 1,8,12  algorithm: [2L' U' 2L,3D]
 1,8,13  algorithm: [R' 3D2 R,2B]
-1,8,14  algorithm: [R2 3D2 R2,2B']
+1,8,14  algorithm: R' [R' 3D2 R,2B] R
 1,8,15  algorithm: [R 3D2 R',2B]
 1,8,16  algorithm: [2F' U2 2F,3D2]
 1,8,17  algorithm: [3D' B' 3D,2B]
@@ -137,7 +137,7 @@
 1,9,16  algorithm: [2U' R 2U,3L]
 1,9,17  algorithm: [3R' U2 3R,2U2]
 1,9,18  algorithm: [B' 2U2 B,3L]
-1,9,19  algorithm: 
+1,9,19  algorithm: B' [B' 2U2 B,3L] B
 1,9,20  algorithm: [B 2U2 B',3L]
 1,9,21  algorithm: D [F 2R F',3L] D'
 1,9,22  algorithm: [F 2R F',3L]
@@ -243,10 +243,10 @@
 1,20,23  algorithm: [3L' B' 3L,2B2]
 1,20,24  algorithm: B2 [U 3B2 U',2L'] B2
 1,21,22  algorithm: [3L2,U 2R2 U']
-1,21,23  algorithm: 
+1,21,23  algorithm: 3R' B' [D 2R D',3L2] B 3R
 1,21,24  algorithm: [3L2,U' 2L2 U]
 1,22,23  algorithm: [U' 3F2 U,2B2]
-1,22,24  algorithm: 
+1,22,24  algorithm: 3B' L2 [L 2B L',3F] L2 3B
 1,23,24  algorithm: D2 [3L2,U 2R2 U'] D2
 2,3,5  algorithm: [3R 2U 3R', U]
 2,3,6  algorithm: [L' 3B L,2F']
@@ -284,10 +284,10 @@
 2,4,18  algorithm: U [U2,2F' 3U' 2F] U'
 2,4,19  algorithm: [3F' 2D 3F, U2]
 2,4,20  algorithm: B [3F 2U 3F', U2] B'
-2,4,21  algorithm: 
-2,4,22  algorithm: 
-2,4,23  algorithm: 
-2,4,24  algorithm: 
+2,4,21  algorithm: 3F' L2 [L 2F L',3B] L2 3F
+2,4,22  algorithm: 3B U2 [2R2, D' 3B' D] U2 3B'
+2,4,23  algorithm: 3B' R2 [3F, R 2B R'] R2 3B
+2,4,24  algorithm: 3F' L' [U 2F U',3B2] L 3F
 2,5,6  algorithm: L [L',3U' 2R' 3U] L'
 2,5,7  algorithm: [3F' 2R2 3F, L2]
 2,5,8  algorithm: [3D' 2R 3D,L']
@@ -297,7 +297,7 @@
 2,5,12  algorithm: [2U' F 2U,3B]
 2,5,13  algorithm: [3F' U2 3F,2U2]
 2,5,14  algorithm: [R' 2U2 R,3B]
-2,5,15  algorithm: [U2 2L2 U2,3B']
+2,5,15  algorithm: R [3B', U 2F' U'] R'
 2,5,16  algorithm: [R 2U2 R',3B]
 2,5,17  algorithm: [3R' U 3R,2U]
 2,5,18  algorithm: [2U B' 2U',3B]
@@ -382,7 +382,7 @@
 2,10,17  algorithm: [B 3U2 B',2R']
 2,10,18  algorithm: [2L U2 2L',3U2]
 2,10,19  algorithm: [B' 3U2 B,2R']
-2,10,20  algorithm: [B2 3U2 B2,2R']
+2,10,20  algorithm: F' [U' 3L' U, 2R'] F
 2,10,21  algorithm: [F' 3L' F,2R']
 2,10,22  algorithm: U' [U' 3F2 U,2R'] U
 2,10,23  algorithm: [F 3R F',2R']
@@ -473,10 +473,10 @@
 2,20,23  algorithm: [B 3R' B',2R]
 2,20,24  algorithm: [D' 2R' D,3B2]
 2,21,22  algorithm: [U' 3L2 U,2R2]
-2,21,23  algorithm: 
+2,21,23  algorithm: 3R' B2 [B 2R B',3L] B2 3R
 2,21,24  algorithm: [U 2F2 U', 3B2]
 2,22,23  algorithm: U' [U' 3F2 U,2B2] U
-2,22,24  algorithm: 
+2,22,24  algorithm: 3F' R' [3B2, D 2F D'] R 3F
 2,23,24  algorithm: [U' 2B2 U,3B2]
 3,4,5  algorithm: [U',3R 2U 3R']
 3,4,6  algorithm: [2L' 3U 2L, U]
@@ -526,7 +526,7 @@
 3,6,13  algorithm: [R 3U2 R',2F']
 3,6,14  algorithm: [2B U2 2B',3U2]
 3,6,15  algorithm: [R' 3U2 R,2F']
-3,6,16  algorithm: [U2 3L2 U2,2F']
+3,6,16  algorithm: L' [U' 3B' U, 2F'] L
 3,6,17  algorithm: [3U B 3U',2F']
 3,6,18  algorithm: [2L U 2L',3U]
 3,6,19  algorithm: [3U B' 3U',2F']
@@ -557,7 +557,7 @@
 3,8,11  algorithm: [2F' L2 2F,3R]
 3,8,12  algorithm: [2L' U 2L,3D]
 3,8,13  algorithm: U2 [R' 3D2 R,2B] U2
-3,8,14  algorithm: U2 [R2 3D2 R2,2B'] U2
+3,8,14  algorithm: U [R' 3F R,2B2] U'
 3,8,15  algorithm: U2 [R 3D2 R',2B] U2
 3,8,16  algorithm: [L' 2F L,3D2]
 3,8,17  algorithm: [2F' L2 2F,3R']
@@ -577,7 +577,7 @@
 3,9,16  algorithm: [3R' F2 3R,2F']
 3,9,17  algorithm: [F' 3R F,2U2]
 3,9,18  algorithm: U2 [B' 2U2 B,3L] U2
-3,9,19  algorithm: 
+3,9,19  algorithm: U' [B 2R B',3L2] U
 3,9,20  algorithm: U2 [B 2U2 B',3L] U2
 3,9,21  algorithm: [3R' F2 3R,2F2]
 3,9,22  algorithm: U2 [F 2R F',3L] U2
@@ -602,7 +602,7 @@
 3,11,14  algorithm: [2D R 2D',3R']
 3,11,15  algorithm: [3B U' 3B',2D]
 3,11,16  algorithm: [D' 3R D,2F']
-3,11,17  algorithm: [F2 2U2 F2,3R']
+3,11,17  algorithm: F [U 2L' U', 3R'] F'
 3,11,18  algorithm: [B 2D2 B',3R']
 3,11,19  algorithm: [3L U2 3L',2D2]
 3,11,20  algorithm: [B' 2D2 B,3R']
@@ -683,10 +683,10 @@
 3,20,23  algorithm: [U' 2R' U,3R2]
 3,20,24  algorithm: U' [D' 2R' D,3B2] U
 3,21,22  algorithm: U2 [3L2,U 2R2 U'] U2
-3,21,23  algorithm: 
+3,21,23  algorithm: 3L' F' [3R2, D 2L D'] F 3L
 3,21,24  algorithm: [2F2,U' 3B2 U]
 3,22,23  algorithm: [U' 2R2 U,3R2]
-3,22,24  algorithm: 
+3,22,24  algorithm: 3F' R2 [3B, R 2F R'] R2 3F
 3,23,24  algorithm: [3R2,U 2L2 U']
 4,5,6  algorithm: [3U 2L' 3U', L]
 4,5,7  algorithm: [L2,3B 2L2 3B']
@@ -730,7 +730,7 @@
 4,7,10  algorithm: [2D F 2D',3F']
 4,7,11  algorithm: [3R U' 3R',2D]
 4,7,12  algorithm: [D' 3F D,2L']
-4,7,13  algorithm: [R2 2D2 R2,3F']
+4,7,13  algorithm: L [U 2B' U', 3F'] L'
 4,7,14  algorithm: [R 2D2 R',3F']
 4,7,15  algorithm: [3B U2 3B',2D2]
 4,7,16  algorithm: [R' 2D2 R,3F']
@@ -805,7 +805,7 @@
 4,12,15  algorithm: [3D R 3D',2L]
 4,12,16  algorithm: [B' 3D' B,2L]
 4,12,17  algorithm: [B' 3D2 B,2L]
-4,12,18  algorithm: [F2 3U2 F2,2L']
+4,12,18  algorithm: B' [2L', U' 3R' U] B
 4,12,19  algorithm: [B 3D2 B',2L]
 4,12,20  algorithm: [2R' U2 2R,3D2]
 4,12,21  algorithm: [F 3L' F',2L]
@@ -873,10 +873,10 @@
 4,20,23  algorithm: U [3L' B' 3L,2B2] U'
 4,20,24  algorithm: U2 [D' 2R' D,3B2] U2
 4,21,22  algorithm: [U' 2F2 U,3F2]
-4,21,23  algorithm: 
+4,21,23  algorithm: 3L' F2 [3R, F 2L F'] F2 3L
 4,21,24  algorithm: U [3L2,U' 2L2 U] U'
 4,22,23  algorithm: [3F2,U 2B2 U']
-4,22,24  algorithm: 
+4,22,24  algorithm: 3B' L' [D 2B D',3F2] L 3B
 4,23,24  algorithm: [U' 3R2 U,2L2]
 5,6,9  algorithm: [2F' 3L 2F, L]
 5,6,10  algorithm: [F' 2U' F,3U']
@@ -898,10 +898,10 @@
 5,7,10  algorithm: [3F' 2R' 3F, L2]
 5,7,11  algorithm: F2 [2D' 3L2 2D, L2] F2
 5,7,12  algorithm: [3F 2L' 3F', L2]
-5,7,13  algorithm: 
-5,7,14  algorithm: 
-5,7,15  algorithm: 
-5,7,16  algorithm: 
+5,7,13  algorithm: 3B' U' [3F2, L 2B L'] U 3B
+5,7,14  algorithm: 3B' U2 [3F, U 2B U'] U2 3B
+5,7,15  algorithm: 3F' D' [L 2F L',3B2] D 3F
+5,7,16  algorithm: 3F' D2 [D 2F D',3B] D2 3F
 5,7,17  algorithm: B2 [L2,2U' 3L2 2U] B2
 5,7,18  algorithm: [3F 2L 3F', L2]
 5,7,19  algorithm: [L2,2U' 3L2 2U]
@@ -929,7 +929,7 @@
 5,9,10  algorithm: F [F',2R 3B' 2R'] F'
 5,9,11  algorithm: L2 [F2,2U' 3F2 2U] L2
 5,9,12  algorithm: [2L 3B 2L',F']
-5,9,13  algorithm: [R2 3B2 R2,2U']
+5,9,13  algorithm: R' [F' 3D' F, 2U'] R
 5,9,14  algorithm: [F 3U F',2U']
 5,9,15  algorithm: [R' 2U R,3B2]
 5,9,16  algorithm: [F' 3D' F,2U']
@@ -956,7 +956,7 @@
 5,10,23  algorithm: F' [3L D2 3L',2U'] F
 5,10,24  algorithm: [2U' F' 2U,3B']
 5,11,12  algorithm: [F',2D 3B2 2D']
-5,11,13  algorithm: F2 [R2 3B2 R2,2U'] F2
+5,11,13  algorithm: F [L' 3D' L,2U2] F' 
 5,11,14  algorithm: F2 [F 3U F',2U'] F2
 5,11,15  algorithm: [2U' F2 2U,3B2]
 5,11,16  algorithm: F2 [F' 3D' F,2U'] F2
@@ -981,7 +981,7 @@
 5,12,23  algorithm: F [3L D2 3L',2U'] F'
 5,12,24  algorithm: [U' 3B U,2L]
 5,13,14  algorithm: R [L' 2B2 L,3B2] R'
-5,13,15  algorithm: 
+5,13,15  algorithm: 3F' U' [3B2, R 2F R'] U 3F
 5,13,16  algorithm: [2U2,L' 3D2 L]
 5,13,17  algorithm: B [R 3U R',2U2] B'
 5,13,18  algorithm: [R 3U R',2U2]
@@ -992,7 +992,7 @@
 5,13,23  algorithm: [3F D' 3F',2U2]
 5,13,24  algorithm: [3F D2 3F',2U2]
 5,14,15  algorithm: [L' 2B2 L,3B2]
-5,14,16  algorithm: 
+5,14,16  algorithm: 3U' B2 [3D, B 2U B'] B2 3U
 5,14,17  algorithm: [R 3B2 R',2U']
 5,14,18  algorithm: [B' 2U B,3U']
 5,14,19  algorithm: B2 [R 3B2 R',2U'] B2
@@ -1066,10 +1066,10 @@
 6,8,10  algorithm: [3D' 2R2 3D, L2]
 6,8,11  algorithm: F [L2,3U 2L2 3U'] F'
 6,8,12  algorithm: [L2,3U 2L2 3U']
-6,8,13  algorithm: 
-6,8,14  algorithm: 
-6,8,15  algorithm: 
-6,8,16  algorithm: 
+6,8,13  algorithm: 3D' B2 [B' 2U' B,3U] B2 3D
+6,8,14  algorithm: 3D' B' [L 2D L',3U2] B 3D
+6,8,15  algorithm: 3D' B2 [B 2D B',3U] B2 3D
+6,8,16  algorithm: 3U' F' [3D2, L 2U L'] F 3U
 6,8,17  algorithm: B' [L2,3U' 2R2 3U] B
 6,8,18  algorithm: [3D 2L2 3D', L2]
 6,8,19  algorithm: [2B' 3L 2B, L2]
@@ -1096,7 +1096,7 @@
 6,10,11  algorithm: [3R 2F 3R', F]
 6,10,12  algorithm: [3D 2F2 3D', F2]
 6,10,13  algorithm: [F' 2U F,3U']
-6,10,14  algorithm: [R2 2F2 R2,3U']
+6,10,14  algorithm: R [F 2D' F', 3U'] R'
 6,10,15  algorithm: [F 2D' F',3U']
 6,10,16  algorithm: [R' 3U R,2F2]
 6,10,17  algorithm: [B' 2R2 B,3U']
@@ -1133,7 +1133,7 @@
 6,12,23  algorithm: F2 [2R' D' 2R,3U'] F2
 6,12,24  algorithm: [3B' L' 3B,2L]
 6,13,14  algorithm: [L' 2U2 L,3U2]
-6,13,15  algorithm: 
+6,13,15  algorithm: 3F' U2 [3B, U 2F U'] U2 3F
 6,13,16  algorithm: L' [2U2,L' 3D2 L] L
 6,13,17  algorithm: [B 3U B',2U']
 6,13,18  algorithm: [R' 2F2 R,3U']
@@ -1144,7 +1144,7 @@
 6,13,23  algorithm: L' [3F D' 3F',2U2] L
 6,13,24  algorithm: L' [3F D2 3F',2U2] L
 6,14,15  algorithm: [3U2,L 2D2 L']
-6,14,16  algorithm: 
+6,14,16  algorithm: 3D' F' [R 2D R',3U2] F 3D
 6,14,17  algorithm: [R' 2U R,3U2]
 6,14,18  algorithm: L' [B' 2U B,3U'] L
 6,14,19  algorithm: [R 2D' R',3U2]
@@ -1246,7 +1246,7 @@
 7,11,12  algorithm: [2L' 3F 2L, F]
 7,11,13  algorithm: [R' 2D' R,3F2]
 7,11,14  algorithm: [F' 3U F,2D]
-7,11,15  algorithm: [R2 3F2 R2,2D']
+7,11,15  algorithm: L' [2D', F' 3U' F] L
 7,11,16  algorithm: [F 3D' F',2D]
 7,11,17  algorithm: [2U' L2 2U,3R2]
 7,11,18  algorithm: [B' 3R2 B,2D]
@@ -1269,7 +1269,7 @@
 7,12,23  algorithm: F' [B' 3R B,2D] F
 7,12,24  algorithm: [3B' L2 3B,2L]
 7,13,14  algorithm: [3F2,L 2B2 L']
-7,13,15  algorithm: 
+7,13,15  algorithm: 2U L2 [R' 2U R,3B2] L2 2U'
 7,13,16  algorithm: [3F2,L' 2F2 L]
 7,13,17  algorithm: [L' 2U L,3F2]
 7,13,18  algorithm: [2U' B' 2U,3F2]
@@ -1280,7 +1280,7 @@
 7,13,23  algorithm: [R 2B R',3F2]
 7,13,24  algorithm: L2 [3F D2 3F',2U2] L2
 7,14,15  algorithm: [L' 3U2 L,2D2]
-7,14,16  algorithm: 
+7,14,16  algorithm: 3D' F2 [F 2D F',3U] F2 3D
 7,14,17  algorithm: L2 [R 3B2 R',2U'] L2
 7,14,18  algorithm: [B 2D' B',3U']
 7,14,19  algorithm: [R' 3F2 R,2D]
@@ -1379,7 +1379,7 @@
 8,12,13  algorithm: [F 2U F',3D]
 8,12,14  algorithm: [R' 3D' R,2B2]
 8,12,15  algorithm: [F' 2D' F,3D]
-8,12,16  algorithm: [R2 2B2 R2,3D']
+8,12,16  algorithm: L [3D', F 2U' F'] L'
 8,12,17  algorithm: [B 2L2 B',3D]
 8,12,18  algorithm: [3U' L2 3U,2L2]
 8,12,19  algorithm: [B' 2L2 B,3D]
@@ -1389,7 +1389,7 @@
 8,12,23  algorithm: [2L D 2L',3D]
 8,12,24  algorithm: [3B' L 3B,2L]
 8,13,14  algorithm: [L' 3F2 L,2B2]
-8,13,15  algorithm: 
+8,13,15  algorithm: 3B' D2 [D 2B D',3F] D2 3B
 8,13,16  algorithm: [L 2U2 L', 3D2]
 8,13,17  algorithm: [B' 3D' B,2U']
 8,13,18  algorithm: L [R 3U R',2U2] L'
@@ -1400,7 +1400,7 @@
 8,13,23  algorithm: [R' 3D2 R,2B']
 8,13,24  algorithm: L [3F D2 3F',2U2] L'
 8,14,15  algorithm: L [L' 2B2 L,3B2] L'
-8,14,16  algorithm: 
+8,14,16  algorithm: 3U' B' [3D2, R 2U R'] B 3U
 8,14,17  algorithm: [3U' B 3U,2B2]
 8,14,18  algorithm: [L' 3U L,2B2]
 8,14,19  algorithm: [3U' B' 3U,2B2]
@@ -1470,10 +1470,10 @@
 9,11,14  algorithm: [3R' 2B' 3R, F2]
 9,11,15  algorithm: R2 [2D' 3F2 2D, F2] R2
 9,11,16  algorithm: [3R 2F' 3R', F2]
-9,11,17  algorithm: 
-9,11,18  algorithm: 
-9,11,19  algorithm: 
-9,11,20  algorithm: 
+9,11,17  algorithm: 3L' U' [3R2, F 2L F'] U 3L
+9,11,18  algorithm: 3L' U2 [3R, U 2L U'] U2 3L
+9,11,19  algorithm: 3R' D' [F 2R F',3L2] D 3R
+9,11,20  algorithm: 3R' D2 [D 2R D',3L] D2 3R
 9,11,21  algorithm: [3R 2F2 3R', F2]
 9,11,22  algorithm: [2D' 3F 2D, F2]
 9,11,23  algorithm: [F2,3L' 2B2 3L]
@@ -1529,14 +1529,14 @@
 9,16,23  algorithm: R [3F D' 3F',2U'] R'
 9,16,24  algorithm: R [3F D2 3F',2U'] R'
 9,17,18  algorithm: B [F' 2L2 F,3L2] B'
-9,17,19  algorithm: 
+9,17,19  algorithm: 3R' U' [3L2, B 2R B'] U 3R
 9,17,20  algorithm: [2U2,F' 3D2 F]
 9,17,21  algorithm: [3R D2 3R',2U2]
 9,17,22  algorithm: [3R D 3R',2U2]
 9,17,23  algorithm: [F' 3R' F,2U2]
 9,17,24  algorithm: [3R D' 3R',2U2]
 9,18,19  algorithm: [F' 2L2 F,3L2]
-9,18,20  algorithm: 
+9,18,20  algorithm: 3U' L2 [3D, L 2U L'] L2 3U
 9,18,21  algorithm: [B' 2U2 B,3L']
 9,18,22  algorithm: B' [3R D 3R',2U2] B
 9,18,23  algorithm: B' [F' 3R' F,2U2] B
@@ -1572,10 +1572,10 @@
 10,12,14  algorithm: [3D' 2B2 3D, F2]
 10,12,15  algorithm: R [F2,3U 2F2 3U'] R'
 10,12,16  algorithm: [F2,3U 2F2 3U']
-10,12,17  algorithm: 
-10,12,18  algorithm: 
-10,12,19  algorithm: 
-10,12,20  algorithm: 
+10,12,17  algorithm: 3U' R2 [3D, R 2U R'] R2 3U
+10,12,18  algorithm: 3D' L' [F 2D F',3U2] L 3D
+10,12,19  algorithm: 3D' L2 [L 2D L',3U] L2 3D
+10,12,20  algorithm: 3U' R' [3D2, F 2U F'] R 3U
 10,12,21  algorithm: [3D 2F' 3D', F2]
 10,12,22  algorithm: [2L' 3F2 2L, F2]
 10,12,23  algorithm: [3D' 2B' 3D, F2]
@@ -1619,14 +1619,14 @@
 10,16,23  algorithm: R2 [3R F 3R',2B'] R2
 10,16,24  algorithm: R2 [2B' D' 2B,3U'] R2
 10,17,18  algorithm: [F' 2U2 F,3U2]
-10,17,19  algorithm: 
+10,17,19  algorithm: 3R' U2 [3L, U 2R U'] U2 3R
 10,17,20  algorithm: F' [2U2,F' 3D2 F] F
 10,17,21  algorithm: F' [3R D2 3R',2U2] F
 10,17,22  algorithm: [B 3U2 B',2R]
 10,17,23  algorithm: [D' 2R' D,3R]
 10,17,24  algorithm: F' [3R D' 3R',2U2] F
 10,18,19  algorithm: [3U2,F 2D2 F']
-10,18,20  algorithm: 
+10,18,20  algorithm: 3D' R' [B 2D B',3U2] R 3D
 10,18,21  algorithm: [2L' D' 2L,3U2]
 10,18,22  algorithm: [2L' D2 2L,3U2]
 10,18,23  algorithm: [2L' D 2L,3U2]
@@ -1697,14 +1697,14 @@
 11,16,23  algorithm: [2D R' 2D',3R]
 11,16,24  algorithm: R' [L' 3B L,2D] R
 11,17,18  algorithm: [3R2,F 2L2 F']
-11,17,19  algorithm: 
+11,17,19  algorithm: 3L' D' [B 2L B',3R2] D 3L
 11,17,20  algorithm: [3R2,F' 2R2 F]
 11,17,21  algorithm: F2 [3R D2 3R',2U2] F2
 11,17,22  algorithm: [B' 2R' B,3R2]
 11,17,23  algorithm: F2 [F' 3R' F,2U2] F2
 11,17,24  algorithm: [B 2L B',3R2]
 11,18,19  algorithm: [F' 3U2 F,2D2]
-11,18,20  algorithm: 
+11,18,20  algorithm: 3D' R2 [R 2D R',3U] R2 3D
 11,18,21  algorithm: F2 [B' 2U2 B,3L'] F2
 11,18,22  algorithm: F' [2L' D2 2L,3U2] F
 11,18,23  algorithm: [B 2D2 B',3R]
@@ -1763,14 +1763,14 @@
 12,16,23  algorithm: [2F D2 2F',3D]
 12,16,24  algorithm: [2F D 2F',3D]
 12,17,18  algorithm: [F' 3R2 F,2L2]
-12,17,19  algorithm: 
+12,17,19  algorithm: 3L' D2 [D 2L D',3R] D2 3L
 12,17,20  algorithm: [F 2U2 F', 3D2]
 12,17,21  algorithm: F [3R D2 3R',2U2] F'
 12,17,22  algorithm: F [3R D 3R',2U2] F'
 12,17,23  algorithm: [D 2L D',3R]
 12,17,24  algorithm: [B' 3D2 B,2L']
 12,18,19  algorithm: F [F' 2L2 F,3L2] F'
-12,18,20  algorithm: 
+12,18,20  algorithm: 3U' L' [3D2, B 2U B'] L 3U
 12,18,21  algorithm: [B 3L B',2L2]
 12,18,22  algorithm: F2 [2L' D2 2L,3U2] F2
 12,18,23  algorithm: [B' 3R' B,2L2]
