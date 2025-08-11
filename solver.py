@@ -9,6 +9,7 @@ import sys as _sys
 from PyQt5 import QtWidgets
 from vispy import scene, app
 from PyQt5.QtCore import QTimer
+from collections import defaultdict
 from PyQt5.QtWidgets import QMessageBox
 from concurrent.futures import ProcessPoolExecutor
 
@@ -25,6 +26,9 @@ output_path = "solution.txt" # output file
 # in that algorithm substitute the PREFIX "2" with (M - a + 1) and the "3" with (M - b + 1) where a and b are the first two numbers in the orbit
 # and where M is the radius of the cube (not diameter).
 
+# Recognize a move token like U, U', U2, 20R, 20R', 20R2, etc.
+MOVE_RE = re.compile(r"\b\d*[RLFBUD](?:2|')?\b")
+COMM_RE = re.compile(r"\[.*?\]")  # first commutator on a line
 
 def apply_3cycle(arr, i, j, k):
     arr[i], arr[j], arr[k] = arr[k], arr[i], arr[j]
@@ -238,7 +242,7 @@ class CubeGridApp(QtWidgets.QMainWindow):
         self.cell_size = cell_size
         self.layout = create_state_matrix(M)
 
-        colors = {  # initial face‐colors mapping
+        colors = {
             **{k: 'W' for k in range(1, 5)},
             **{k: 'O' for k in range(5, 9)},
             **{k: 'G' for k in range(9, 13)},
@@ -269,6 +273,74 @@ class CubeGridApp(QtWidgets.QMainWindow):
             self.setWindowTitle("NxNxN Solver (n^2-type-pieces only)")
             self.showMaximized()
 
+    def rearrange_commutators_by_setup_moves(self):
+        """
+        Regroup solution.txt so that:
+        - First block: lines with NO setup moves outside the brackets -> 'NONE'
+        - Then: blocks by the EXACT outer token (including any numeric slice prefix and postfix),
+                using the LEFT token if both sides exist.
+        - Last: lines without brackets at all -> 'NO_BRACKET'
+        """
+        src = output_path
+        dst = src[:-4] + "_grouped_by_setup.txt" if src.endswith(".txt") else src + "_grouped_by_setup.txt"
+
+        try:
+            with open(src, "r") as f:
+                lines = [ln.strip() for ln in f if ln.strip()]
+        except Exception as e:
+            QMessageBox.critical(self, "File Error", f"Could not read {src}:\n{e}")
+            return
+
+        def key_for(line: str) -> str:
+            m = COMM_RE.search(line)
+            if not m:
+                return "NO_BRACKET"
+            pre = line[:m.start()]
+            post = line[m.end():]
+            left_tokens = MOVE_RE.findall(pre)
+            right_tokens = MOVE_RE.findall(post)
+            left = left_tokens[-1] if left_tokens else None
+            right = right_tokens[0] if right_tokens else None
+            if not left and not right:
+                return "NONE"
+            # EXACT token as written (e.g., 'R', "R'", 'R2', '16R2', ...)
+            return left or right
+
+        from collections import defaultdict
+        buckets = defaultdict(list)
+        order = []  # preserve first-seen order of groups
+
+        for ln in lines:
+            k = key_for(ln)
+            if k not in buckets:
+                order.append(k)
+            buckets[k].append(ln)
+
+        # Build final order: NONE first, then first-seen tokens (excluding NONE/NO_BRACKET),
+        # finally NO_BRACKET if present.
+        final_keys = []
+        if "NONE" in buckets:
+            final_keys.append("NONE")
+        final_keys += [k for k in order if k not in ("NONE", "NO_BRACKET")]
+        if "NO_BRACKET" in buckets:
+            final_keys.append("NO_BRACKET")
+
+        try:
+            with open(dst, "w") as out:
+                for k in final_keys:
+                    out.write(f"# --- {k} ({len(buckets[k])}) ---\n")
+                    out.write("\n".join(buckets[k]))
+                    out.write("\n\n")
+        except Exception as e:
+            QMessageBox.critical(self, "File Error", f"Could not write {dst}:\n{e}")
+            return
+
+        self.solve_output.setPlainText(
+            f"Grouped {sum(map(len, buckets.values()))} line(s) into {len(final_keys)} block(s). Saved to {dst}"
+        )
+
+
+
     def _build_ui(self):
         # Central widget and layout
         central = QtWidgets.QWidget()
@@ -281,35 +353,40 @@ class CubeGridApp(QtWidgets.QMainWindow):
         self.move_entry.setPlaceholderText("Moves (e.g. 1R U2 ...)")
         self.move_entry.textChanged.connect(lambda: self.on_scramble(live=True))
         mf.addWidget(self.move_entry)
-        apply_btn = QtWidgets.QPushButton("Apply Move")
-        apply_btn.clicked.connect(self.apply_solution)
-        mf.addWidget(apply_btn)
-        scramble_btn = QtWidgets.QPushButton("Scramble")
+
+        scramble_btn = QtWidgets.QPushButton("[1] Scramble")
         scramble_btn.clicked.connect(self.scramble_all_orbits)
         mf.addWidget(scramble_btn)
-        plan_btn = QtWidgets.QPushButton("Full swap‑plan (cycles.txt)")
+
+        plan_btn = QtWidgets.QPushButton("[2] Generate full swap-plan (cycles.txt)")
         plan_btn.clicked.connect(self.produce_full_plan)
         mf.addWidget(plan_btn)
+
+        # NEW button
+        rearr_btn = QtWidgets.QPushButton("[4] Rearrange commutators by setup moves")
+        rearr_btn.clicked.connect(self.rearrange_commutators_by_setup_moves)
+        mf.addWidget(rearr_btn)
+        
+        apply_btn = QtWidgets.QPushButton("[5] Apply found Solution on Cube")
+        apply_btn.clicked.connect(self.apply_solution)
+        mf.addWidget(apply_btn)
+
         vbox.addLayout(mf)
 
         # Orbit reader & translator
         of = QtWidgets.QHBoxLayout()
         of.addWidget(QtWidgets.QLabel("a:"))
-        self.orbit_a = QtWidgets.QLineEdit()
-        self.orbit_a.setFixedWidth(40)
+        self.orbit_a = QtWidgets.QLineEdit(); self.orbit_a.setFixedWidth(40)
         of.addWidget(self.orbit_a)
         of.addWidget(QtWidgets.QLabel("b:"))
-        self.orbit_b = QtWidgets.QLineEdit()
-        self.orbit_b.setFixedWidth(40)
+        self.orbit_b = QtWidgets.QLineEdit(); self.orbit_b.setFixedWidth(40)
         of.addWidget(self.orbit_b)
         read_btn = QtWidgets.QPushButton("Read Orbit")
-        read_btn.clicked.connect(self.read_orbit)
-        of.addWidget(read_btn)
-        trans_btn = QtWidgets.QPushButton("Translate full swap list (cycles) into moves")
-        trans_btn.clicked.connect(self.translate_full_swap)
-        of.addWidget(trans_btn)
-        self.orbit_output = QtWidgets.QLineEdit()
-        of.addWidget(self.orbit_output)
+        read_btn.clicked.connect(self.read_orbit); of.addWidget(read_btn)
+        
+        trans_btn = QtWidgets.QPushButton("[3] Translate full swap list (cycles) into moves")
+        trans_btn.clicked.connect(self.translate_full_swap); of.addWidget(trans_btn)
+        self.orbit_output = QtWidgets.QLineEdit(); of.addWidget(self.orbit_output)
         vbox.addLayout(of)
 
         # Solve output
@@ -321,6 +398,7 @@ class CubeGridApp(QtWidgets.QMainWindow):
         self.canvas_container = QtWidgets.QWidget()
         self.canvas_layout = QtWidgets.QHBoxLayout(self.canvas_container)
         vbox.addWidget(self.canvas_container)
+
 
     def _create_vispy_canvas(self):
         # Create VisPy SceneCanvas and embed in Qt
@@ -564,6 +642,8 @@ class CubeGridApp(QtWidgets.QMainWindow):
     def apply_pU(self, p): self.apply_move(p, [9,5,17,13], [10,6,18,14], 'b','a')
     def apply_pD(self, p): self.apply_move(p, [12,16,20,8], [11,15,19,7], 'a','b')
     
+    
+    
 def process_algorithms(input_path, m, output_path):
     app.use_app('pyqt5')
     qapp = QtWidgets.QApplication(sys.argv)
@@ -584,7 +664,7 @@ def process_algorithms(input_path, m, output_path):
     qapp.quit()
 
 if __name__ == '__main__':
-    M = 200 # Radius of the cube. Not diameter
+    M = 20 # Radius of the cube. Not diameter
     app.use_app('pyqt5')
     qapp = QtWidgets.QApplication(sys.argv)
     win = CubeGridApp(M, cell_size=1)
