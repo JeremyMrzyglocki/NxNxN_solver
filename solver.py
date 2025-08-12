@@ -27,7 +27,7 @@ output_path = "solution.txt" # output file
 # and where M is the radius of the cube (not diameter).
 
 # Recognize a move token like U, U', U2, 20R, 20R', 20R2, etc.
-MOVE_RE = re.compile(r"\b\d*[RLFBUD](?:2|')?\b")
+MOVE_RE = re.compile(r"\b\d*[RLFBUD](?:2|')?(?!\w)")
 COMM_RE = re.compile(r"\[.*?\]")  # first commutator on a line
 
 def apply_3cycle(arr, i, j, k):
@@ -275,69 +275,225 @@ class CubeGridApp(QtWidgets.QMainWindow):
 
     def rearrange_commutators_by_setup_moves(self):
         """
-        Regroup solution.txt so that:
-        - First block: lines with NO setup moves outside the brackets -> 'NONE'
-        - Then: blocks by the EXACT outer token (including any numeric slice prefix and postfix),
-                using the LEFT token if both sides exist.
-        - Last: lines without brackets at all -> 'NO_BRACKET'
+        Regroup solution.txt with heavy debugging, then factor repeated setup moves:
+        • PAIR groups (e.g., R2 … R2):
+            - first line: keep LEFT setup only (strip RIGHT)
+            - middle lines: strip BOTH setups
+            - last line: keep RIGHT setup only (strip LEFT)
+        • SINGLE groups:
+            - left-only setups: keep only on first line
+            - right-only setups: keep only on last line
+        • NONE / NO_BRACKET unchanged
         """
         src = output_path
         dst = src[:-4] + "_grouped_by_setup.txt" if src.endswith(".txt") else src + "_grouped_by_setup.txt"
+        debug_path = "grouping_debug.log"
 
         try:
-            with open(src, "r") as f:
-                lines = [ln.strip() for ln in f if ln.strip()]
+            with open(src, "r", encoding="utf-8") as f:
+                lines = [ln.rstrip("\n") for ln in f if ln.strip()]
         except Exception as e:
             QMessageBox.critical(self, "File Error", f"Could not read {src}:\n{e}")
             return
 
-        def key_for(line: str) -> str:
+        def dbg(fp, msg):
+            fp.write(msg + "\n")
+
+        # NOTE: this MOVE_RE MUST preserve postfixes like "'" and "2"
+        # You already fixed it above, but reiterating here:
+        # MOVE_RE = re.compile(r"\b\d*[RLFBUD](?:2|')?(?!\w)")
+        # We reuse the global MOVE_RE you defined.
+
+        def extract_tokens_with_spans(line: str):
+            """
+            Return (status, L_matches, R_matches, span) where L/R are lists of Match objects
+            (so we know exact positions). OUTERMOST left is L[0]; OUTERMOST right is R[-1].
+            """
             m = COMM_RE.search(line)
             if not m:
-                return "NO_BRACKET"
+                return "NO_BRACKET", [], [], None
             pre = line[:m.start()]
             post = line[m.end():]
-            left_tokens = MOVE_RE.findall(pre)
-            right_tokens = MOVE_RE.findall(post)
-            left = left_tokens[-1] if left_tokens else None
-            right = right_tokens[0] if right_tokens else None
-            if not left and not right:
-                return "NONE"
-            # EXACT token as written (e.g., 'R', "R'", 'R2', '16R2', ...)
-            return left or right
+            L = list(MOVE_RE.finditer(pre))
+            R = list(MOVE_RE.finditer(post))
+            if not L and not R:
+                return "NONE", [], [], (m.start(), m.end())
+            return "OK", L, R, (m.start(), m.end())
 
         from collections import defaultdict
         buckets = defaultdict(list)
-        order = []  # preserve first-seen order of groups
+        group_order = []
 
-        for ln in lines:
-            k = key_for(ln)
-            if k not in buckets:
-                order.append(k)
-            buckets[k].append(ln)
+        # ---------- pass 1: classify with logs ----------
+        with open(debug_path, "w", encoding="utf-8") as log:
+            dbg(log, "=== GROUPING DEBUG START ===")
+            dbg(log, f"source file: {src}")
+            dbg(log, f"total input lines: {len(lines)}")
+            dbg(log, f"MOVE_RE: {MOVE_RE.pattern}")
+            dbg(log, f"COMM_RE: {COMM_RE.pattern}")
+            dbg(log, "")
 
-        # Build final order: NONE first, then first-seen tokens (excluding NONE/NO_BRACKET),
-        # finally NO_BRACKET if present.
+            for idx, ln in enumerate(lines, 1):
+                status, L, R, span = extract_tokens_with_spans(ln)
+                dbg(log, f"[{idx:05d}] LINE: {ln}")
+                if span is None:
+                    dbg(log, "        COMM: <none>")
+                else:
+                    dbg(log, f"        COMM span: {span}")
+                    pre = ln[:span[0]]; post = ln[span[1]:]
+                    dbg(log, f"        PRE:  {pre!r}")
+                    dbg(log, f"        POST: {post!r}")
+                dbg(log, f"        TOKENS L: {[m.group(0) for m in L]}")
+                dbg(log, f"        TOKENS R: {[m.group(0) for m in R]}")
+
+                if status == "NO_BRACKET":
+                    key = ("NO_BRACKET",)
+                    payload = {"line": ln}
+                    dbg(log, "        STATUS: NO_BRACKET -> key=('NO_BRACKET',)")
+                elif status == "NONE":
+                    key = ("NONE",)
+                    payload = {"line": ln}
+                    dbg(log, "        STATUS: NONE -> key=('NONE',)")
+                else:
+                    left_outer = L[0].group(0) if L else None
+                    right_outer = R[-1].group(0) if R else None
+                    dbg(log, f"        OUTER LEFTMOST: {left_outer!r}")
+                    dbg(log, f"        OUTER RIGHTMOST: {right_outer!r}")
+
+                    if left_outer and right_outer:
+                        key = ("PAIR", left_outer, right_outer)
+                        # Keep spans to surgically remove tokens later
+                        payload = {
+                            "line": ln,
+                            "span": span,
+                            "L": [(m.group(0), m.start(), m.end()) for m in L],
+                            "R": [(m.group(0), m.start(), m.end()) for m in R],
+                        }
+                        dbg(log, f"        KEY: PAIR {left_outer} … {right_outer}")
+                    else:
+                        token = left_outer or right_outer
+                        key = ("SINGLE", token)
+                        payload = {
+                            "line": ln,
+                            "span": span,
+                            "L": [(m.group(0), m.start(), m.end()) for m in L],
+                            "R": [(m.group(0), m.start(), m.end()) for m in R],
+                        }
+                        dbg(log, f"        KEY: SINGLE {token}")
+
+                if key not in buckets:
+                    group_order.append(key)
+                    dbg(log, f"        -> NEW GROUP CREATED: {key}")
+                else:
+                    dbg(log, f"        -> appended to group: {key}")
+
+                buckets[key].append(payload)
+                dbg(log, "")
+
+            dbg(log, "=== GROUP SUMMARY ===")
+            for k in group_order:
+                dbg(log, f"{k}: {len(buckets[k])} item(s)")
+            for special in (("NONE",), ("NO_BRACKET",)):
+                if special in buckets and special not in group_order:
+                    dbg(log, f"{special}: {len(buckets[special])} item(s)")
+            dbg(log, "=== END DEBUG ===")
+
+        # ---------- factoring helpers ----------
+        def remove_left_outer(pre: str, left_token: str) -> str:
+            # remove the very first occurrence at start of pre (after optional leading spaces)
+            pattern = r'^\s*' + re.escape(left_token) + r'(?:\s+)?'
+            return re.sub(pattern, '', pre, count=1)
+
+        def remove_right_outer(post: str, right_token: str) -> str:
+            # remove the very last occurrence at end of post (with optional leading space)
+            pattern = r'(?:\s+)?' + re.escape(right_token) + r'\s*$'
+            return re.sub(pattern, '', post, count=1)
+
+        def line_after_factoring(payload, keep_left: bool, keep_right: bool):
+            ln = payload["line"]
+            span = payload.get("span")
+            if not span:
+                return ln  # NONE/NO_BRACKET
+
+            pre, comm, post = ln[:span[0]], ln[span[0]:span[1]], ln[span[1]:]
+
+            # figure the outer tokens if present
+            L = payload.get("L", [])
+            R = payload.get("R", [])
+            left_outer = L[0][0] if L else None
+            right_outer = R[-1][0] if R else None
+
+            # Strip as requested
+            if left_outer and not keep_left:
+                pre = remove_left_outer(pre, left_outer)
+            if right_outer and not keep_right:
+                post = remove_right_outer(post, right_outer)
+
+            # Normalize trivial spaces around the bracket
+            # Ensure: if pre ends with spaces and comm starts with '[', it's fine; same for post.
+            return f"{pre}{comm}{post}".strip()
+
+        # ---------- order groups ----------
         final_keys = []
-        if "NONE" in buckets:
-            final_keys.append("NONE")
-        final_keys += [k for k in order if k not in ("NONE", "NO_BRACKET")]
-        if "NO_BRACKET" in buckets:
-            final_keys.append("NO_BRACKET")
+        if ("NONE",) in buckets:
+            final_keys.append(("NONE",))
+        final_keys += [k for k in group_order if k[0] == "PAIR"]
+        final_keys += [k for k in group_order if k[0] == "SINGLE"]
+        if ("NO_BRACKET",) in buckets:
+            final_keys.append(("NO_BRACKET",))
 
+        def header_for(key):
+            t = key[0]
+            if t == "PAIR":
+                return f"{key[1]} … {key[2]}"
+            if t == "SINGLE":
+                return key[1]
+            return t
+
+        # ---------- write output with factoring ----------
         try:
-            with open(dst, "w") as out:
+            with open(dst, "w", encoding="utf-8") as out:
                 for k in final_keys:
-                    out.write(f"# --- {k} ({len(buckets[k])}) ---\n")
-                    out.write("\n".join(buckets[k]))
-                    out.write("\n\n")
+                    items = buckets[k]
+                    #out.write(f"# --- {header_for(k)} ({len(items)}) ---\n")
+
+                    if k[0] == "PAIR":
+                        # Apply factoring across the whole PAIR group
+                        n = len(items)
+                        for i, payload in enumerate(items):
+                            keep_left = (i == 0)       # only first keeps LEFT
+                            keep_right = (i == n - 1)  # only last keeps RIGHT
+                            out.write(line_after_factoring(payload, keep_left, keep_right) + "\n")
+                        out.write("\n")
+
+                    elif k[0] == "SINGLE":
+                        # Decide if this single token lives on the left or right (check first item)
+                        first = items[0]
+                        first_L = [t for (t, _, __) in first.get("L", [])]
+                        token = k[1]
+                        side = "LEFT" if (first_L and first_L[0] == token) else "RIGHT"
+
+                        n = len(items)
+                        for i, payload in enumerate(items):
+                            keep_left = (side == "LEFT" and i == 0)
+                            keep_right = (side == "RIGHT" and i == n - 1)
+                            out.write(line_after_factoring(payload, keep_left, keep_right) + "\n")
+                        out.write("\n")
+
+                    else:
+                        # NONE / NO_BRACKET: unchanged
+                        for payload in items:
+                            out.write(payload["line"] + "\n")
+                        out.write("\n")
         except Exception as e:
             QMessageBox.critical(self, "File Error", f"Could not write {dst}:\n{e}")
             return
 
-        self.solve_output.setPlainText(
-            f"Grouped {sum(map(len, buckets.values()))} line(s) into {len(final_keys)} block(s). Saved to {dst}"
+        self.solve_output.append(
+            f"✔ Grouped & factored into {len(final_keys)} group(s).\n"
+            f"Output: {dst}\n🪵 Debug log: {debug_path}"
         )
+
 
 
 
@@ -356,20 +512,33 @@ class CubeGridApp(QtWidgets.QMainWindow):
 
         scramble_btn = QtWidgets.QPushButton("[1] Scramble")
         scramble_btn.clicked.connect(self.scramble_all_orbits)
+        scramble_btn.setMinimumHeight(80)
         mf.addWidget(scramble_btn)
 
-        plan_btn = QtWidgets.QPushButton("[2] Generate full swap-plan (cycles.txt)")
+        plan_btn = QtWidgets.QPushButton("[2] Generate full\n swap-plan (cycles.txt)")
         plan_btn.clicked.connect(self.produce_full_plan)
+        plan_btn.setMinimumHeight(80)
         mf.addWidget(plan_btn)
+        
+        trans_btn = QtWidgets.QPushButton("[3] Translate full\n swap list (cycles) into moves")
+        trans_btn.clicked.connect(self.translate_full_swap)
+        trans_btn.setMinimumHeight(80)
+        mf.addWidget(trans_btn)
 
-        # NEW button
-        rearr_btn = QtWidgets.QPushButton("[4] Rearrange commutators by setup moves")
+        rearr_btn = QtWidgets.QPushButton("[4] Rearrange commutators\n by setup moves")
         rearr_btn.clicked.connect(self.rearrange_commutators_by_setup_moves)
+        rearr_btn.setMinimumHeight(80)
         mf.addWidget(rearr_btn)
         
-        apply_btn = QtWidgets.QPushButton("[5] Apply found Solution on Cube")
+        apply_btn = QtWidgets.QPushButton("[5] Apply found\n Solution on Cube")
         apply_btn.clicked.connect(self.apply_solution)
+        apply_btn.setMinimumHeight(80)
         mf.addWidget(apply_btn)
+        
+        self.hide_edges_cb = QtWidgets.QCheckBox("Hide edges & diagonal centers")
+        self.hide_edges_cb.toggled.connect(self.update_image)
+        mf.addWidget(self.hide_edges_cb)
+        
 
         vbox.addLayout(mf)
 
@@ -384,9 +553,6 @@ class CubeGridApp(QtWidgets.QMainWindow):
         read_btn = QtWidgets.QPushButton("Read Orbit")
         read_btn.clicked.connect(self.read_orbit); of.addWidget(read_btn)
         
-        trans_btn = QtWidgets.QPushButton("[3] Translate full swap list (cycles) into moves")
-        trans_btn.clicked.connect(self.translate_full_swap); of.addWidget(trans_btn)
-        self.orbit_output = QtWidgets.QLineEdit(); of.addWidget(self.orbit_output)
         vbox.addLayout(of)
 
         # Solve output
@@ -441,6 +607,7 @@ class CubeGridApp(QtWidgets.QMainWindow):
             self.view.camera.set_range(x=(w, 0), y=(h, 0))
             self._first_draw = True
         self.canvas.update()
+        
 
     def produce_full_plan(self):
         t0 = time.time()
@@ -664,7 +831,7 @@ def process_algorithms(input_path, m, output_path):
     qapp.quit()
 
 if __name__ == '__main__':
-    M = 50 # Radius of the cube. Not diameter
+    M = 15 # Radius of the cube. Not diameter
     app.use_app('pyqt5')
     qapp = QtWidgets.QApplication(sys.argv)
     win = CubeGridApp(M, cell_size=1)
