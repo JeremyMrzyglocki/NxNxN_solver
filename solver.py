@@ -1,6 +1,7 @@
 import io
 import re
 import sys
+import glob
 import time
 import random
 import itertools
@@ -13,13 +14,12 @@ from collections import defaultdict
 from PyQt5.QtWidgets import QMessageBox
 from concurrent.futures import ProcessPoolExecutor
 
-# File paths
-swap_plan_path = "cycles.txt" # This txt will contain the translation of the cube into cycles needed to solve it (in this case the non-diag centers)
+swap_plan_path = "cycles_wave*.txt" # This txt will contain the translation of the cube into cycles needed to solve it (in this case the non-diag centers)
 table_path = "table.txt" # This is the table of cycles -> commutators
 output_path = "solution.txt" # output file
 
 
-# read the first cycles.txt file. It will have a format like: "orbit(3,2) - rot(1,3,14)"
+# read the first cycles_waveX.txt files. They will have a format like: "orbit(3,2) - rot(1,3,14)"
 # and the table.txt file will have a line with either that exact triplet or its inversion.
 # E.g. you will find the line "1,3,14  algorithm: [2B' 3R2 2B,R']"
 # Now we only take that algorithm after the colon and substitute the prefixes with the following formula:
@@ -36,38 +36,144 @@ def apply_3cycle(arr, i, j, k):
 def count_correct(arr, target):
     return sum(1 for x, y in zip(arr, target) if x == y)
 
-def greedy_3cycle_sort(target, initial, max_steps=10000): # This algorithm is one potential spot of optimization. It averages about 8 cycles per scrambled orbit.
-    arr = initial.copy()
+def greedy_3cycle_sort(target, initial, max_steps=10000, *, verbose=False):
+    """
+    Greedy 3-cycle sort with pruning, 2-cycle parity fix, and wavepacking.
+    Returns:
+        steps (int)
+        moves (list[tuple[int,int,int,int]]) -> (i,j,k,wave), 0-based indices
+    """
+
+    tgt = list(target)
+    arr = list(initial)
     n = len(arr)
-    triples = []
-    for i, j, k in itertools.combinations(range(n), 3):
-        triples.append((i, j, k))
-        triples.append((i, k, j))
+
+    correct = [arr[i] == tgt[i] for i in range(n)]
+    incorrect = [i for i in range(n) if not correct[i]]
+
+    def gain_of(i, j, k):
+        before = (correct[i]) + (correct[j]) + (correct[k])
+        after  = (arr[k] == tgt[i]) + (arr[i] == tgt[j]) + (arr[j] == tgt[k])
+        return after - before
+
+    def apply_and_update(i, j, k):
+        arr[i], arr[j], arr[k] = arr[k], arr[i], arr[j]
+        for idx in (i, j, k):
+            was = correct[idx]
+            now = (arr[idx] == tgt[idx])
+            correct[idx] = now
+            if was and not now:
+                if idx not in incorrect:
+                    incorrect.append(idx)
+            elif not was and now:
+                if idx in incorrect:
+                    incorrect.remove(idx)
+
+    def try_two_cycle_fix():
+        if len(incorrect) != 2:
+            return None
+        p, q = incorrect
+        if arr[p] == tgt[q] and arr[q] == tgt[p]:
+            candidates = [r for r in range(n) if r not in (p, q) and tgt[r] == tgt[p]]
+            if not candidates:
+                return None
+            for r in candidates:
+                if arr[r] == tgt[r]:
+                    return (p, q, r)
+            return (p, q, candidates[0])
+        return None
+
+    def canon_cycle(i, j, k):
+        if i <= j and i <= k:   return (i, j, k)
+        if j <= i and j <= k:   return (j, k, i)
+        return (k, i, j)
+
     step = 0
-    while arr != target and step < max_steps:
-        curr_correct = count_correct(arr, target)
+    moves = []
+
+    # --- wavepacking state ---
+    wave_id = 1
+    current_wave_used = set()   # indices already used in this wave
+
+    while incorrect and step < max_steps:
         best_gain = 0
         best_move = None
-        for (i, j, k) in triples:
-            arr2 = arr.copy()
-            apply_3cycle(arr2, i, j, k)
-            gain = count_correct(arr2, target) - curr_correct
-            if gain > best_gain:
-                best_gain = gain
-                best_move = (i, j, k)
-        if best_move is None:
+
+        inc = incorrect
+        if len(inc) >= 3:
+            for x, y, z in itertools.combinations(inc, 3):
+                for (i, j, k) in ((x, y, z), (x, z, y)):
+                    if not (arr[k] == tgt[i] or arr[i] == tgt[j] or arr[j] == tgt[k]):
+                        continue
+                    g = gain_of(i, j, k)
+                    if g > best_gain:
+                        best_gain, best_move = g, (i, j, k)
+                        if best_gain == 3:
+                            break
+                if best_gain == 3:
+                    break
+
+        if best_move is None or best_gain <= 0:
+            fix = try_two_cycle_fix()
+            if fix is not None:
+                i, j, k = fix
+                # wave decision based on index overlap
+                if {i, j, k} & current_wave_used:
+                    wave_id += 1
+                    current_wave_used.clear()
+
+                apply_and_update(i, j, k)
+                step += 1
+                ci, cj, ck = canon_cycle(i, j, k)
+                moves.append((ci, cj, ck, wave_id))
+                current_wave_used.update((ci, cj, ck))
+
+                if verbose:
+                    print(f"rot({ci},{cj},{ck}) -> {''.join(arr)}  (parity) wave {wave_id}")
+                continue
+
+            # Optional small fallback: try 2 incorrect + 1 correct (sampled)
+            if len(inc) >= 2 and any(correct):
+                correct_idxs = [r for r in range(n) if correct[r]]
+                helpers = correct_idxs if len(correct_idxs) <= 16 else random.sample(correct_idxs, 16)
+                for x, y in itertools.combinations(inc, 2):
+                    for z in helpers:
+                        for (i, j, k) in ((x, y, z), (x, z, y), (z, x, y)):
+                            if not (arr[k] == tgt[i] or arr[i] == tgt[j] or arr[j] == tgt[k]):
+                                continue
+                            g = gain_of(i, j, k)
+                            if g > best_gain:
+                                best_gain, best_move = g, (i, j, k)
+                    if best_move:
+                        break
+
+        if best_move is None or best_gain <= 0:
+            if verbose:
+                print(f"[stop] no improving triple; step={step}, correct={sum(correct)}")
             break
+
         i, j, k = best_move
-        apply_3cycle(arr, i, j, k)
+
+        # wave decision based on index overlap
+        if {i, j, k} & current_wave_used:
+            wave_id += 1
+            current_wave_used.clear()
+
+        apply_and_update(i, j, k)
         step += 1
-        print(f"rot({i},{j},{k}) -> {''.join(arr)}")
-    return step
+        ci, cj, ck = canon_cycle(i, j, k)
+        moves.append((ci, cj, ck, wave_id))
+        current_wave_used.update((ci, cj, ck))
+
+        if verbose:
+            print(f"rot({ci},{cj},{ck}) -> {''.join(arr)} (gain {best_gain}) wave {wave_id}")
+
+    return step, moves
+
 
 def invert_move(m: str) -> str: # inverts a move
-    if m.endswith("'"):
-        return m[:-1]
-    if m.endswith("2"):
-        return m
+    if m.endswith("'"): return m[:-1]
+    if m.endswith("2"): return m
     return m + "'"
 
 def expand_commutator(expr: str) -> str: # expr is like "[A_moves , B_moves]". Returns the 4‑part expansion: A B A^-1 B^-1
@@ -83,8 +189,7 @@ def expand_commutator(expr: str) -> str: # expr is like "[A_moves , B_moves]". R
     return " ".join(A + B + A_inv + B_inv)
 
 def create_state_matrix(M): # This holds all of the information
-    N = 2
-    region_size = N * M
+    region_size = 2 * M
     rows, cols = 3 * region_size, 4 * region_size
     face_map = {
         (0, 1): ('W', 1), (1, 0): ('O', 5), (1, 1): ('G', 9),
@@ -140,103 +245,132 @@ def swap_commutator_contents(alg: str) -> str: # Finds every '[A, B]' in the str
         A, B = parts[0].strip(), parts[1].strip()
         return f"[{B}, {A}]"
     # match '[' then anything up to a comma+something up to the closing ']'
-    return re.sub(r'\[([^\]]+?,[^\]]+?)\]', _swap, alg)
+    return re.sub(r'\[([^\]]+?,[^\]]+?)\]', _swap, alg) # Write merged file
+    
+def count_moves(algorithm: str) -> int:
+    """
+    Count moves in an algorithm string.
+    - Normal tokens (U, U', U2, 20R, ...) count as 1 each.
+    - Inside [A,B], expand to A B A^-1 B^-1 => 2x total tokens inside.
+    """
+    total = 0
 
-def translator(): # translate the cylces.txt into usable algorithms (runs in O(n)-time and - just like generating the cylces for the orbits - parallelized)
+    # First handle commutators explicitly
+    for comm in re.findall(r'\[(.*?)\]', algorithm):
+        try:
+            a_part, b_part = comm.split(",", 1)
+        except ValueError:
+            continue
+        # Count tokens in A and B
+        a_tokens = a_part.strip().split()
+        b_tokens = b_part.strip().split()
+        total += 2 * (len(a_tokens) + len(b_tokens))  # double
+    # Remove commutators from string before counting remaining tokens
+    algorithm_wo_comm = re.sub(r'\[.*?\]', '', algorithm)
+    tokens = algorithm_wo_comm.split()
+    total += len(tokens)
+    return total
+
+
+def translator():
+    """
+    Translate cycles_wave*.txt into algorithms using table.txt.
+    - Writes per-wave outputs solution_wave{w}.txt
+    - Writes merged output solution.txt
+    - Prints total move count at the end
+    """
     start = time.time()
-    swap_plan = read_swap_plan(swap_plan_path)
-    table = read_table(table_path)
-    processed_algorithms = []
+    import glob, os
+    from collections import defaultdict
 
-    for line in swap_plan:
-        match = re.match(r'orbit\((\d+),(\d+)\) - rot\((\d+),(\d+),(\d+)\)', line)
-        if match:
+    wave_files = sorted(
+        glob.glob("cycles_wave*.txt"),
+        key=lambda p: int(re.search(r"cycles_wave(\d+)\.txt", os.path.basename(p)).group(1))
+    )
+    if not wave_files:
+        raise FileNotFoundError("No cycles_wave*.txt files found. Generate waves first.")
+
+    table = read_table(table_path)
+    per_wave_algorithms = defaultdict(list)
+    merged_algorithms = []
+    move_count_total = 0
+
+    def wave_id_for(path: str) -> int:
+        m = re.search(r"cycles_wave(\d+)\.txt", os.path.basename(path))
+        return int(m.group(1))
+
+    for path in wave_files:
+        wave_id = wave_id_for(path)
+        swap_plan = read_swap_plan(path)
+        processed_algorithms = []
+
+        for line in swap_plan:
+            match = re.match(r'orbit\((\d+),(\d+)\) - rot\((\d+),(\d+),(\d+)\)', line)
+            if not match:
+                continue
+
             a, b, c, d, e = map(int, match.groups())
-            # some skipping conditions:
             if a == b or a == M or b == M:
-                print(f"Skipping line due to conditions: {line}")
-                print("....")
                 continue
 
             triplet = f"{c},{d},{e}"
             inverted_triplet = f"{c},{e},{d}"
-            print(f"Triplet: {triplet}, Inverted Triplet: {inverted_triplet}")
 
-            # prepare a single-pass replacement map for "2" and "3"
-            mapping = {
-                '2': str(M - b + 1),
-                '3': str(M - a + 1),
-            }
+            mapping = {'2': str(M - b + 1), '3': str(M - a + 1)}
             pattern = r'\b([23])(?=[A-Za-z])'
 
             for table_line in table:
-                if triplet in table_line:
-                    print(f"Found matching line in table: {table_line}")
+                if triplet in table_line or inverted_triplet in table_line:
                     if ':' in table_line:
                         algorithm_part = table_line.split(':', 1)[1].strip()
-                        # apply both replacements in one pass
-                        algorithm_part = re.sub(pattern,
-                                                lambda m: mapping[m.group(1)],
-                                                algorithm_part)
-                        algorithm_part = swap_commutator_contents(algorithm_part)
-
-                        print(f"Processed algorithm: {algorithm_part} for triplet {triplet}")
+                        algorithm_part = re.sub(pattern, lambda m: mapping[m.group(1)], algorithm_part)
+                        if triplet in table_line:
+                            algorithm_part = swap_commutator_contents(algorithm_part)
                         processed_algorithms.append(algorithm_part)
-                    else:
-                        print(f"Warning: No colon found in line: {table_line}")
+                        move_count_total += count_moves(algorithm_part)  # count moves here
                     break
 
-                elif inverted_triplet in table_line:
-                    print(f"Found matching inverted line in table: {table_line}")
-                    if ':' in table_line:
-                        algorithm_part = table_line.split(':', 1)[1].strip()
-                        # apply both replacements in one pass
-                        algorithm_part = re.sub(pattern,
-                                                lambda m: mapping[m.group(1)],
-                                                algorithm_part)
-                        print(f"Processed inverted algorithm: {algorithm_part} for inverted triplet {inverted_triplet}")
-                        processed_algorithms.append(algorithm_part)
-                    else:
-                        print(f"Warning: No colon found in line: {table_line}")
-                    break
+        per_wave_algorithms[wave_id].extend(processed_algorithms)
+        merged_algorithms.extend(processed_algorithms)
 
-            print("....")
-    write_output(processed_algorithms, output_path)
+    # Write per-wave
+    for w in sorted(per_wave_algorithms):
+        out_w = f"solution_wave{w}.txt"
+        write_output(per_wave_algorithms[w], out_w)
+
+    # Write merged
+    write_output(merged_algorithms, output_path)
+
     end = time.time()
-    print(f"\n✅ Done. Saved {len(processed_algorithms)} algorithm(s) to {output_path}.")
+    total = sum(len(v) for v in per_wave_algorithms.values())
+    print(f"\n✅ Done. Saved {total} algorithm(s) across {len(per_wave_algorithms)} wave file(s).")
+    print(f"Total moves (counting commutators doubled): {move_count_total}")
     print(f"translator() took {end - start:.2f} seconds")
 
+
+
+
 def _compute_orbit_swap(args):
-    """ Worker for one orbit: runs greedy_3cycle_sort, captures the
-    printed rot(...) lines, and formats them as orbit(...) entries. """
     a, b, subcell_color, M = args
-    target = ['W']*4 + ['O']*4 + ['G']*4 + ['R']*4 + ['B']*4 + ['Y']*4
+    target = 'WWWWOOOOGGGGRRRRBBBBYYYY'
+    initial = [subcell_color[(k, a, b)] for k in range(1, 25)]
 
-    # build the starting 1×24 list for this orbit
-    initial = [subcell_color[(k, a, b)] for k in range(1,25)]
+    _, moves = greedy_3cycle_sort(target, initial, verbose=False)
 
-    # capture stdout from greedy_3cycle_sort
-    buf = io.StringIO()
-    old = _sys.stdout
-    _sys.stdout = buf
-    greedy_3cycle_sort(target, initial)
-    _sys.stdout = old
+    waves = defaultdict(list)
+    for (i, j, k, w) in moves:
+        waves[w].append(f"orbit({a},{b}) - rot({i+1},{j+1},{k+1})")
+    return dict(waves)
+    
+    
 
-    out = []
-    for line in buf.getvalue().splitlines():
-        if not line.startswith("rot("):
-            continue
-        nums = line[len("rot("):].split(")")[0].split(",")
-        i, j, k = [int(n)+1 for n in nums]
-        out.append(f"orbit({a},{b}) - rot({i},{j},{k})")
-    return out
 
 # -----------------------------------------------------------------------------
 # Main application
 # -----------------------------------------------------------------------------
 
 class CubeGridApp(QtWidgets.QMainWindow):
-    def __init__(self, M=50, cell_size=30, gui=True):
+    def __init__(self, M=50, cell_size=1, gui=True):
         super().__init__()
         self.M = M
         self.cell_size = cell_size
@@ -272,230 +406,9 @@ class CubeGridApp(QtWidgets.QMainWindow):
             self.update_image()
             self.setWindowTitle("NxNxN Solver (n^2-type-pieces only)")
             self.showMaximized()
-
-    def rearrange_commutators_by_setup_moves(self):
-        """
-        Regroup solution.txt with heavy debugging, then factor repeated setup moves:
-        • PAIR groups (e.g., R2 … R2):
-            - first line: keep LEFT setup only (strip RIGHT)
-            - middle lines: strip BOTH setups
-            - last line: keep RIGHT setup only (strip LEFT)
-        • SINGLE groups:
-            - left-only setups: keep only on first line
-            - right-only setups: keep only on last line
-        • NONE / NO_BRACKET unchanged
-        """
-        src = output_path
-        dst = src[:-4] + "_grouped_by_setup.txt" if src.endswith(".txt") else src + "_grouped_by_setup.txt"
-        debug_path = "grouping_debug.log"
-
-        try:
-            with open(src, "r", encoding="utf-8") as f:
-                lines = [ln.rstrip("\n") for ln in f if ln.strip()]
-        except Exception as e:
-            QMessageBox.critical(self, "File Error", f"Could not read {src}:\n{e}")
-            return
-
-        def dbg(fp, msg):
-            fp.write(msg + "\n")
-
-        # NOTE: this MOVE_RE MUST preserve postfixes like "'" and "2"
-        # You already fixed it above, but reiterating here:
-        # MOVE_RE = re.compile(r"\b\d*[RLFBUD](?:2|')?(?!\w)")
-        # We reuse the global MOVE_RE you defined.
-
-        def extract_tokens_with_spans(line: str):
-            """
-            Return (status, L_matches, R_matches, span) where L/R are lists of Match objects
-            (so we know exact positions). OUTERMOST left is L[0]; OUTERMOST right is R[-1].
-            """
-            m = COMM_RE.search(line)
-            if not m:
-                return "NO_BRACKET", [], [], None
-            pre = line[:m.start()]
-            post = line[m.end():]
-            L = list(MOVE_RE.finditer(pre))
-            R = list(MOVE_RE.finditer(post))
-            if not L and not R:
-                return "NONE", [], [], (m.start(), m.end())
-            return "OK", L, R, (m.start(), m.end())
-
-        from collections import defaultdict
-        buckets = defaultdict(list)
-        group_order = []
-
-        # ---------- pass 1: classify with logs ----------
-        with open(debug_path, "w", encoding="utf-8") as log:
-            dbg(log, "=== GROUPING DEBUG START ===")
-            dbg(log, f"source file: {src}")
-            dbg(log, f"total input lines: {len(lines)}")
-            dbg(log, f"MOVE_RE: {MOVE_RE.pattern}")
-            dbg(log, f"COMM_RE: {COMM_RE.pattern}")
-            dbg(log, "")
-
-            for idx, ln in enumerate(lines, 1):
-                status, L, R, span = extract_tokens_with_spans(ln)
-                dbg(log, f"[{idx:05d}] LINE: {ln}")
-                if span is None:
-                    dbg(log, "        COMM: <none>")
-                else:
-                    dbg(log, f"        COMM span: {span}")
-                    pre = ln[:span[0]]; post = ln[span[1]:]
-                    dbg(log, f"        PRE:  {pre!r}")
-                    dbg(log, f"        POST: {post!r}")
-                dbg(log, f"        TOKENS L: {[m.group(0) for m in L]}")
-                dbg(log, f"        TOKENS R: {[m.group(0) for m in R]}")
-
-                if status == "NO_BRACKET":
-                    key = ("NO_BRACKET",)
-                    payload = {"line": ln}
-                    dbg(log, "        STATUS: NO_BRACKET -> key=('NO_BRACKET',)")
-                elif status == "NONE":
-                    key = ("NONE",)
-                    payload = {"line": ln}
-                    dbg(log, "        STATUS: NONE -> key=('NONE',)")
-                else:
-                    left_outer = L[0].group(0) if L else None
-                    right_outer = R[-1].group(0) if R else None
-                    dbg(log, f"        OUTER LEFTMOST: {left_outer!r}")
-                    dbg(log, f"        OUTER RIGHTMOST: {right_outer!r}")
-
-                    if left_outer and right_outer:
-                        key = ("PAIR", left_outer, right_outer)
-                        # Keep spans to surgically remove tokens later
-                        payload = {
-                            "line": ln,
-                            "span": span,
-                            "L": [(m.group(0), m.start(), m.end()) for m in L],
-                            "R": [(m.group(0), m.start(), m.end()) for m in R],
-                        }
-                        dbg(log, f"        KEY: PAIR {left_outer} … {right_outer}")
-                    else:
-                        token = left_outer or right_outer
-                        key = ("SINGLE", token)
-                        payload = {
-                            "line": ln,
-                            "span": span,
-                            "L": [(m.group(0), m.start(), m.end()) for m in L],
-                            "R": [(m.group(0), m.start(), m.end()) for m in R],
-                        }
-                        dbg(log, f"        KEY: SINGLE {token}")
-
-                if key not in buckets:
-                    group_order.append(key)
-                    dbg(log, f"        -> NEW GROUP CREATED: {key}")
-                else:
-                    dbg(log, f"        -> appended to group: {key}")
-
-                buckets[key].append(payload)
-                dbg(log, "")
-
-            dbg(log, "=== GROUP SUMMARY ===")
-            for k in group_order:
-                dbg(log, f"{k}: {len(buckets[k])} item(s)")
-            for special in (("NONE",), ("NO_BRACKET",)):
-                if special in buckets and special not in group_order:
-                    dbg(log, f"{special}: {len(buckets[special])} item(s)")
-            dbg(log, "=== END DEBUG ===")
-
-        # ---------- factoring helpers ----------
-        def remove_left_outer(pre: str, left_token: str) -> str:
-            # remove the very first occurrence at start of pre (after optional leading spaces)
-            pattern = r'^\s*' + re.escape(left_token) + r'(?:\s+)?'
-            return re.sub(pattern, '', pre, count=1)
-
-        def remove_right_outer(post: str, right_token: str) -> str:
-            # remove the very last occurrence at end of post (with optional leading space)
-            pattern = r'(?:\s+)?' + re.escape(right_token) + r'\s*$'
-            return re.sub(pattern, '', post, count=1)
-
-        def line_after_factoring(payload, keep_left: bool, keep_right: bool):
-            ln = payload["line"]
-            span = payload.get("span")
-            if not span:
-                return ln  # NONE/NO_BRACKET
-
-            pre, comm, post = ln[:span[0]], ln[span[0]:span[1]], ln[span[1]:]
-
-            # figure the outer tokens if present
-            L = payload.get("L", [])
-            R = payload.get("R", [])
-            left_outer = L[0][0] if L else None
-            right_outer = R[-1][0] if R else None
-
-            # Strip as requested
-            if left_outer and not keep_left:
-                pre = remove_left_outer(pre, left_outer)
-            if right_outer and not keep_right:
-                post = remove_right_outer(post, right_outer)
-
-            # Normalize trivial spaces around the bracket
-            # Ensure: if pre ends with spaces and comm starts with '[', it's fine; same for post.
-            return f"{pre}{comm}{post}".strip()
-
-        # ---------- order groups ----------
-        final_keys = []
-        if ("NONE",) in buckets:
-            final_keys.append(("NONE",))
-        final_keys += [k for k in group_order if k[0] == "PAIR"]
-        final_keys += [k for k in group_order if k[0] == "SINGLE"]
-        if ("NO_BRACKET",) in buckets:
-            final_keys.append(("NO_BRACKET",))
-
-        def header_for(key):
-            t = key[0]
-            if t == "PAIR":
-                return f"{key[1]} … {key[2]}"
-            if t == "SINGLE":
-                return key[1]
-            return t
-
-        # ---------- write output with factoring ----------
-        try:
-            with open(dst, "w", encoding="utf-8") as out:
-                for k in final_keys:
-                    items = buckets[k]
-                    #out.write(f"# --- {header_for(k)} ({len(items)}) ---\n")
-
-                    if k[0] == "PAIR":
-                        # Apply factoring across the whole PAIR group
-                        n = len(items)
-                        for i, payload in enumerate(items):
-                            keep_left = (i == 0)       # only first keeps LEFT
-                            keep_right = (i == n - 1)  # only last keeps RIGHT
-                            out.write(line_after_factoring(payload, keep_left, keep_right) + "\n")
-                        out.write("\n")
-
-                    elif k[0] == "SINGLE":
-                        # Decide if this single token lives on the left or right (check first item)
-                        first = items[0]
-                        first_L = [t for (t, _, __) in first.get("L", [])]
-                        token = k[1]
-                        side = "LEFT" if (first_L and first_L[0] == token) else "RIGHT"
-
-                        n = len(items)
-                        for i, payload in enumerate(items):
-                            keep_left = (side == "LEFT" and i == 0)
-                            keep_right = (side == "RIGHT" and i == n - 1)
-                            out.write(line_after_factoring(payload, keep_left, keep_right) + "\n")
-                        out.write("\n")
-
-                    else:
-                        # NONE / NO_BRACKET: unchanged
-                        for payload in items:
-                            out.write(payload["line"] + "\n")
-                        out.write("\n")
-        except Exception as e:
-            QMessageBox.critical(self, "File Error", f"Could not write {dst}:\n{e}")
-            return
-
-        self.solve_output.append(
-            f"✔ Grouped & factored into {len(final_keys)} group(s).\n"
-            f"Output: {dst}\n🪵 Debug log: {debug_path}"
-        )
-
-
-
+            
+            
+            
 
     def _build_ui(self):
         # Central widget and layout
@@ -515,7 +428,7 @@ class CubeGridApp(QtWidgets.QMainWindow):
         scramble_btn.setMinimumHeight(80)
         mf.addWidget(scramble_btn)
 
-        plan_btn = QtWidgets.QPushButton("[2] Generate full\n swap-plan (cycles.txt)")
+        plan_btn = QtWidgets.QPushButton("[2] Generate full\n swap-plan (cycles_waves.txt-files)")
         plan_btn.clicked.connect(self.produce_full_plan)
         plan_btn.setMinimumHeight(80)
         mf.addWidget(plan_btn)
@@ -526,7 +439,7 @@ class CubeGridApp(QtWidgets.QMainWindow):
         mf.addWidget(trans_btn)
 
         rearr_btn = QtWidgets.QPushButton("[4] Rearrange commutators\n by setup moves")
-        rearr_btn.clicked.connect(self.rearrange_commutators_by_setup_moves)
+        #rearr_btn.clicked.connect(self.rearrange_commutators_by_setup_moves)
         rearr_btn.setMinimumHeight(80)
         mf.addWidget(rearr_btn)
         
@@ -611,27 +524,35 @@ class CubeGridApp(QtWidgets.QMainWindow):
 
     def produce_full_plan(self):
         t0 = time.time()
-        fname = "cycles.txt"
-        # prepare arguments for every (a,b)
-        # pass a copy of the initial color-mapping and M to each worker
+
         args = [
             (a, b, self.initial_subcell_color, self.M)
             for a in range(1, self.M+1)
             for b in range(1, self.M+1)
         ]
 
-        # run in parallel
+        from collections import defaultdict
+        wave_lines = defaultdict(list)  # wave -> list[str]
+
         with ProcessPoolExecutor() as exe:
-            # map() returns results in “args” order
-            results = exe.map(_compute_orbit_swap, args)
-            # write everything out as soon as each worker completes
+            for wave_dict in exe.map(_compute_orbit_swap, args):
+                for w, lines in wave_dict.items():
+                    wave_lines[w].extend(lines)
+
+        # write one file per wave (sorted by wave id)
+        written = []
+        for w in sorted(wave_lines):
+            fname = f"cycles_wave{w}.txt"
             with open(fname, "w") as f:
-                for orbit_moves in results:
-                    for line in orbit_moves:
-                        f.write(line + "\n")
+                f.write("\n".join(wave_lines[w]))
+                f.write("\n")
+            written.append(fname)
 
         dt = time.time() - t0
-        self.solve_output.setPlainText(f"Full swap-plan saved to {fname} in {dt:.2f}s")
+        self.solve_output.setPlainText(
+            f"Saved {len(written)} wave file(s): {', '.join(written)} in {dt:.2f}s"
+        )
+
 
     def translate_full_swap(self):
         t0 = time.time()
@@ -727,8 +648,8 @@ class CubeGridApp(QtWidgets.QMainWindow):
             QMessageBox.critical(self, "File Error", f"Could not read solution.txt:\n{e}")
             return
 
-        # break into 100-line chunks
-        chunk_size = 100
+        # break into 1000-line chunks
+        chunk_size = 1000
         self._chunks = [" ".join(lines[i:i+chunk_size])
                         for i in range(0, len(lines), chunk_size)]
         self._chunk_idx = 0
@@ -814,10 +735,9 @@ class CubeGridApp(QtWidgets.QMainWindow):
 def process_algorithms(input_path, m, output_path):
     app.use_app('pyqt5')
     qapp = QtWidgets.QApplication(sys.argv)
-
     with open(input_path, 'r') as infile, open(output_path, 'w') as outfile:
         for line in infile:
-            algorithm = line.strip()
+            algorithm = line.strip() 
             if not algorithm:
                 continue
 
@@ -825,13 +745,13 @@ def process_algorithms(input_path, m, output_path):
             cube.move_entry.setText(algorithm)             # Apply the algorithm
             cube.on_scramble(live=False)
             cube.produce_full_plan()            # Run full plan (writes to 'cycles.txt')
-            with open("cylces.txt", "r") as plan_file:             # Read the generated file
+            with open("cycles.txt", "r") as plan_file:             # Read the generated file
                 output = plan_file.read()
             outfile.write(f"algorithm: {algorithm}\n\noutput:\n{output.strip()}\n\n")      # Format and write results
     qapp.quit()
 
 if __name__ == '__main__':
-    M = 15 # Radius of the cube. Not diameter
+    M = 50 # half of N where N is the size of the cube (N=2M). Only odd cubes supported for now
     app.use_app('pyqt5')
     qapp = QtWidgets.QApplication(sys.argv)
     win = CubeGridApp(M, cell_size=1)
