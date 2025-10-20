@@ -93,7 +93,7 @@ class SolverUI(QtWidgets.QMainWindow):
         row1.setSpacing(8)
 
         self.move_entry = QLineEdit()
-        self.move_entry.setPlaceholderText("Moves (e.g. 1R U2 3F' …). Live-applied on baseline.")
+        self.move_entry.setPlaceholderText("Moves (e.g. 1R U2 3F' …). Live-applied on the cube.")
         self.move_entry.textChanged.connect(lambda _: self.on_moves_changed(live=True))
         self.move_entry.setMinimumHeight(36)
         row1.addWidget(self.move_entry, 3)
@@ -114,7 +114,7 @@ class SolverUI(QtWidgets.QMainWindow):
         row2.addWidget(self.scramble_btn)
 
 
-        self.play_parallel_btn = QPushButton("[3.] Play solution in UI")
+        self.play_parallel_btn = QPushButton("[3.] Play solution in UI (recommended only for M <= 30)")
         self.play_parallel_btn.setToolTip("Play wave_*_parallel.txt from latest run_dir")
         self.play_parallel_btn.clicked.connect(self.play_parallel_solution)
         row2.addWidget(self.play_parallel_btn)
@@ -397,7 +397,7 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=50, seed=123456, cell_size=1)
+    win = SolverUI(M=20, seed=123456, cell_size=1)
     sys.exit(qapp.exec_())
 
 if __name__ == "__main__":
