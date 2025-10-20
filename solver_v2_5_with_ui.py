@@ -63,7 +63,7 @@ class SolverUI(QtWidgets.QMainWindow):
         # for animation playback
         self._moves = []
         self._move_idx = 0
-        self._moves_per_tick = 5000  # tune for your machine
+        self._moves_per_tick = 60  # tune for your machine
         self._anim_running = False
 
         # cube layout mapping for rendering
@@ -397,7 +397,7 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=20, seed=123456, cell_size=1)
+    win = SolverUI(M=15, seed=123456, cell_size=1)
     sys.exit(qapp.exec_())
 
 if __name__ == "__main__":
