@@ -580,6 +580,27 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     else if (pattern == "02020001"){add_cycle(2,8,1, face1, face2, layer);}
     else if (pattern == "00220001"){add_cycle(3,8,1, face1, face2, layer);}
 
+    else if (pattern == "22201000" || pattern == "22021000" || pattern == "20221000"){add_cycle(1,5,2, face1, face2, layer);}
+    else if (pattern == "22200100" || pattern == "22020100" || pattern == "20220100"){add_cycle(1,6,2, face1, face2, layer);}
+    else if (pattern == "22200010" || pattern == "22020010" || pattern == "20220010"){add_cycle(1,7,2, face1, face2, layer);}
+    else if (pattern == "22200001" || pattern == "22020001" || pattern == "20220001"){add_cycle(1,8,2, face1, face2, layer);}
+
+    else if (pattern == "02221000"){add_cycle(2,5,1, face1, face2, layer);}
+    else if (pattern == "02220100"){add_cycle(2,6,1, face1, face2, layer);}
+    else if (pattern == "02220010"){add_cycle(2,7,1, face1, face2, layer);}
+    else if (pattern == "02220001"){add_cycle(2,8,1, face1, face2, layer);}
+
+
+    else if (pattern == "10002220" || pattern == "10002202" || pattern == "10002022"){add_cycle(1,5,2, face1, face2, layer);}
+    else if (pattern == "01002220" || pattern == "01002202" || pattern == "01002022"){add_cycle(2,5,1, face1, face2, layer);}
+    else if (pattern == "00102220" || pattern == "00102202" || pattern == "00102022"){add_cycle(3,5,1, face1, face2, layer);}
+    else if (pattern == "00012220" || pattern == "00012202" || pattern == "00012022"){add_cycle(4,5,1, face1, face2, layer);}
+
+    else if (pattern == "10000222"){add_cycle(1,6,2, face1, face2, layer);}
+    else if (pattern == "01000222"){add_cycle(2,6,1, face1, face2, layer);}
+    else if (pattern == "00100222"){add_cycle(3,6,1, face1, face2, layer);}
+    else if (pattern == "00010222"){add_cycle(4,6,1, face1, face2, layer);}
+
     else {
         cout << "\nPattern not recognized: " << pattern << endl;
     }
@@ -694,8 +715,8 @@ void sorting_via_sorting_network(string state){
 
 int main() {
     //string state = "314532423403512051412005";
-    //string state = random_state();
-    string state = "012353040242541131435205";
+    string state = random_state();
+    //string state = "012353040242541131435205";
 
 
     cout << endl << "Find 3-cycles to solve via two-face-sorting-network-method" << endl << endl;
