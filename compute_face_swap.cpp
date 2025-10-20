@@ -16,14 +16,24 @@ vector<vector<int>> layer_3;
 vector<vector<int>> layer_4;
 vector<vector<int>> layer_5;
 
+vector<vector<int>> layer_1b;
+vector<vector<int>> layer_2b;
+vector<vector<int>> layer_3b;
+vector<vector<int>> layer_4b;
+vector<vector<int>> layer_5b;
+
 inline void add_cycle(int a, int b, int c, int d, int e, int layer) { // d and e are the face-indices
-    if (layer == 1){
-        layer_1.push_back({a, b, c, d, e});
-    } 
+    if (layer == 1){layer_1.push_back({a, b, c, d, e});} 
     else if (layer == 2){layer_2.push_back({a, b, c, d, e});}
     else if (layer == 3){layer_3.push_back({a, b, c, d, e});}
     else if (layer == 4){layer_4.push_back({a, b, c, d, e});}
     else if (layer == 5){layer_5.push_back({a, b, c, d, e});}
+
+    if (layer == 6){layer_1b.push_back({a, b, c, d, e});} 
+    else if (layer == 7){layer_2b.push_back({a, b, c, d, e});}
+    else if (layer == 8){layer_3b.push_back({a, b, c, d, e});}
+    else if (layer == 9){layer_4b.push_back({a, b, c, d, e});}
+    else if (layer == 10){layer_5b.push_back({a, b, c, d, e});}
 
 } 
 
@@ -608,7 +618,7 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     else if (pattern == "22211100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
     else if (pattern == "22211010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
     else if (pattern == "22211001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "22210110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
+    else if (pattern == "22210110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
     else if (pattern == "22210101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
     else if (pattern == "22210011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
     
@@ -834,11 +844,31 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     else if (pattern == "01011022"){add_cycle(2,7,3, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer);}
     else if (pattern == "00111022"){add_cycle(3,7,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer);}
 
-    // 3-3 swaps (only ones)
+    // 3-3 swaps (only "ones")
+
+    else if (pattern == "11101110"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);} 
+    else if (pattern == "11101101"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
+    else if (pattern == "11101011"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
+    else if (pattern == "11100111"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
+
+    else if (pattern == "01111110"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,2, face1, face2, layer+5);} 
+    else if (pattern == "01111101"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer+5);} 
+    else if (pattern == "01111011"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer+5);} 
+    else if (pattern == "01110111"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer+5);} 
+
+    else if (pattern == "10111110"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);} 
+    else if (pattern == "10111101"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
+    else if (pattern == "10111011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
+    else if (pattern == "10110111"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
+    
+    else if (pattern == "11011110"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);} 
+    else if (pattern == "11011101"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
+    else if (pattern == "11011011"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
+    else if (pattern == "11010111"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
+ 
 
     // 4-4 swap
-
-
+    else if (pattern == "11111111"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5); add_cycle(3,8,4, face1, face2, layer+5);} 
 
 
 
@@ -891,6 +921,7 @@ void print_state(string state){
 void sorting_via_sorting_network(string state){
     cout << endl << endl << "Layer 1:" << endl;
     layer_1.clear();   
+    layer_1b.clear();
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 5), 0, 5, 1);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 3), 1, 3, 1);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 4), 2, 4, 1);
@@ -901,9 +932,18 @@ void sorting_via_sorting_network(string state){
     apply_cycles(state, layer_1);
     print_state(state);
 
+    
+    cout << endl << endl << "Layer 1b:" << endl;
+    for (const auto& cyc : layer_1b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_1b);
+    print_state(state);
+
 
     cout << endl << endl << "Layer 2:" << endl;
     layer_2.clear();   
+    layer_2b.clear();
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 2);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 2);
 
@@ -913,9 +953,17 @@ void sorting_via_sorting_network(string state){
     apply_cycles(state, layer_2);
     print_state(state);
 
+    cout << endl << endl << "Layer 2b:" << endl;
+    for (const auto& cyc : layer_2b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_2b);
+    print_state(state);
+
 
     cout << endl <<  endl << "Layer 3:" << endl;
-    layer_3.clear();   
+    layer_3.clear();  
+    layer_3b.clear(); 
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 3), 0, 3, 3);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 5), 2, 5, 3);
 
@@ -925,10 +973,18 @@ void sorting_via_sorting_network(string state){
     apply_cycles(state, layer_3);
     print_state(state);
 
+    cout << endl << endl << "Layer 3b:" << endl;
+    for (const auto& cyc : layer_3b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_3b);
+    print_state(state);
+
 
 
     cout << endl <<  endl << "Layer 4:" << endl;
-    layer_4.clear();   
+    layer_4.clear();  
+    layer_4b.clear(); 
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 1), 0, 1, 4);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 4);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 4, 5), 4, 5, 4);
@@ -939,9 +995,17 @@ void sorting_via_sorting_network(string state){
     apply_cycles(state, layer_4);
     print_state(state);
 
+    cout << endl << endl << "Layer 4b:" << endl;
+    for (const auto& cyc : layer_4b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_4b);
+    print_state(state);
+
     
     cout << endl <<  endl << "Layer 5:" << endl;
-    layer_5.clear();   
+    layer_5.clear(); 
+    layer_5b.clear();  
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 5);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 5);
 
@@ -951,6 +1015,13 @@ void sorting_via_sorting_network(string state){
     apply_cycles(state, layer_5);
     print_state(state);
     cout << endl;
+
+    cout << endl << endl << "Layer 5b:" << endl;
+    for (const auto& cyc : layer_5b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_5b);
+    print_state(state);
 
 }
 
