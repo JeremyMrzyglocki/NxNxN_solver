@@ -4,6 +4,8 @@ from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 from typing import Optional
+import itertools
+
 
 # ---------- paths / constants ----------
 RUNS_ROOT = Path("runs")
@@ -13,6 +15,7 @@ RUN_DIR.mkdir(parents=True, exist_ok=True)
 COLOR_ID = {'W': 0, 'O': 1, 'G': 2, 'R': 3, 'B': 4, 'Y': 5}
 ID_COLOR = ['W', 'O', 'G', 'R', 'B', 'Y']
 CHUNKSIZE = 1024
+
 
 # ---------- packed color field ----------
 class ColorField:
@@ -85,111 +88,17 @@ class ColorField:
         return other
 
 # ---------- 3-cycle planner ----------
-"""
-def greedy_3cycle_sort(target, initial, max_steps=10000):
-    tgt = list(target)
-    arr = list(initial)
-    correct = [arr[i] == tgt[i] for i in range(24)]
-    incorrect = [i for i in range(24) if not correct[i]] # caution! not the inverse of correct
-
-    def gain_of(i, j, k):
-        before = (correct[i]) + (correct[j]) + (correct[k])
-        after  = (arr[k] == tgt[i]) + (arr[i] == tgt[j]) + (arr[j] == tgt[k])
-        return after - before
-
-    def apply_and_update(i, j, k):
-        arr[i], arr[j], arr[k] = arr[k], arr[i], arr[j]
-        for idx in (i, j, k):
-            was = correct[idx]
-            now = (arr[idx] == tgt[idx])
-            correct[idx] = now # updates the correctness-list
-            if was and not now:
-                if idx not in incorrect: incorrect.append(idx) # updates the incorrectness-list
-            elif not was and now:
-                if idx in incorrect: incorrect.remove(idx) # updates the incorrectness-list
-
-    def try_two_cycle_fix():
-        if len(incorrect) != 2: return None
-        p, q = incorrect
-        if arr[p] == tgt[q] and arr[q] == tgt[p]: # if this isn't given anyways after arriving at this line, I think there is a problem
-            candidates = [r for r in range(24) if r not in (p, q) and tgt[r] == tgt[p]]
-            for r in candidates:
-                if arr[r] == tgt[r]: return (p, q, r)
-            return (p, q, candidates[0]) if candidates else None
-        return None
-
-    def canon_cycle(i, j, k):
-        if i <= j and i <= k:   return (i, j, k)
-        if j <= i and j <= k:   return (j, k, i)
-        return (k, i, j)
-
-    step = 0
-    moves = []
-    wave_id = 1
-    current_wave_used = set()
-
-    while incorrect and step < max_steps:
-        best_gain = 0
-        best_move = None
-
-        inc = incorrect
-        if len(inc) >= 3:
-            for x, y, z in itertools.combinations(inc, 3):
-                for (i, j, k) in ((x, y, z), (x, z, y)):
-                    if not (arr[k] == tgt[i] or arr[i] == tgt[j] or arr[j] == tgt[k]): continue # if not at least one is solved
-                    g = gain_of(i, j, k)
-                    if g > best_gain:
-                        best_gain, best_move = g, (i, j, k)
-                        if best_gain == 3: break
-                if best_gain == 3: break
-
-        if best_move is None or best_gain <= 0:
-            fix = try_two_cycle_fix()
-            if fix is not None:
-                i, j, k = fix
-                if {i, j, k} & current_wave_used:
-                    wave_id += 1
-                    current_wave_used.clear()
-                apply_and_update(i, j, k)
-                step += 1
-                ci, cj, ck = canon_cycle(i, j, k)
-                moves.append((ci, cj, ck, wave_id))
-                current_wave_used.update((ci, cj, ck))
-                continue
-            break
-
-        i, j, k = best_move
-        if {i, j, k} & current_wave_used:
-            wave_id += 1
-            current_wave_used.clear()
-        apply_and_update(i, j, k)
-        step += 1
-        ci, cj, ck = canon_cycle(i, j, k)
-        moves.append((ci, cj, ck, wave_id))
-        current_wave_used.update((ci, cj, ck))
-    return step, moves"""
 
 def greedy_3cycle_sort(target, initial, max_steps=10000):
-    """
-    Logic-identical to the original:
-      - Same candidate enumeration order
-      - Same gain calculation
-      - Same parity fix behavior
-      - Same wave packing & tie-breaking
-    Only mechanical speedups (locals, cached lookups, set for membership).
-    """
-    import itertools
 
     N = 24
     tgt = list(target)
     arr = list(initial)
 
-    # same construction as before
     correct = [arr[i] == tgt[i] for i in range(N)]
-    incorrect = [i for i in range(N) if not correct[i]]  # order matters
-    incorrect_set = set(incorrect)                        # membership helper (does NOT replace the list)
+    incorrect = [i for i in range(N) if not correct[i]]  
+    incorrect_set = set(incorrect)                 
 
-    # local bindings to reduce attribute lookups
     rngN = range(N)
     combinations = itertools.combinations
 
@@ -201,31 +110,25 @@ def greedy_3cycle_sort(target, initial, max_steps=10000):
         return after - before
 
     def apply_and_update(i, j, k):
-        # same 3-cycle application
         arr[i], arr[j], arr[k] = arr[k], arr[i], arr[j]
-        # update correctness + incorrect/incorrect_set exactly like before
         for idx in (i, j, k):
             was = correct[idx]
             now = (arr[idx] == tgt[idx])
             correct[idx] = now
             if was and not now:
-                # append only if not already in list
                 if idx not in incorrect_set:
-                    incorrect.append(idx)   # keep the original list order behavior
+                    incorrect.append(idx)  
                     incorrect_set.add(idx)
             elif (not was) and now:
-                # remove only if present (preserve list order of the remainder)
                 if idx in incorrect_set:
-                    incorrect.remove(idx)   # same O(n) behavior/order as before
+                    incorrect.remove(idx)  
                     incorrect_set.remove(idx)
 
     def try_two_cycle_fix():
-        # unchanged logic (uses the same order in 'incorrect')
         if len(incorrect) != 2:
             return None
         p, q = incorrect
         if arr[p] == tgt[q] and arr[q] == tgt[p]:
-            # same candidate scan order
             candidates = [r for r in rngN if r not in (p, q) and tgt[r] == tgt[p]]
             for r in candidates:
                 if arr[r] == tgt[r]:
@@ -234,7 +137,6 @@ def greedy_3cycle_sort(target, initial, max_steps=10000):
         return None
 
     def canon_cycle(i, j, k):
-        # identical canonicalization for recording
         if i <= j and i <= k:   return (i, j, k)
         if j <= i and j <= k:   return (j, k, i)
         return (k, i, j)
@@ -248,13 +150,9 @@ def greedy_3cycle_sort(target, initial, max_steps=10000):
         best_gain = 0
         best_move = None
 
-        # IMPORTANT: keep using the *list* 'incorrect' to preserve iteration order
         inc = incorrect
         if len(inc) >= 3:
-            # combinations(inc, 3) yields triples in the same order as your original
             for x, y, z in combinations(inc, 3):
-                # same two orientation checks and same short-circuit structure
-                # (x,y,z)
                 i, j, k = x, y, z
                 if (arr[k] == tgt[i]) or (arr[i] == tgt[j]) or (arr[j] == tgt[k]):
                     g = gain_of(i, j, k)
@@ -262,7 +160,6 @@ def greedy_3cycle_sort(target, initial, max_steps=10000):
                         best_gain, best_move = g, (i, j, k)
                         if best_gain == 3:
                             break
-                # (x,z,y)
                 i, j, k = x, z, y
                 if (best_gain != 3) and ((arr[k] == tgt[i]) or (arr[i] == tgt[j]) or (arr[j] == tgt[k])):
                     g = gain_of(i, j, k)
@@ -270,10 +167,8 @@ def greedy_3cycle_sort(target, initial, max_steps=10000):
                         best_gain, best_move = g, (i, j, k)
                         if best_gain == 3:
                             break
-            # preserve the same break behavior after inner loop
-            # (the outer loop checks best_gain==3 and breaks once as in original)
             if best_gain == 3:
-                pass  # no-op; retains identical flow
+                pass
 
         if best_move is None or best_gain <= 0:
             fix = try_two_cycle_fix()
@@ -288,7 +183,7 @@ def greedy_3cycle_sort(target, initial, max_steps=10000):
                 moves.append((ci, cj, ck, wave_id))
                 current_wave_used.update((ci, cj, ck))
                 continue
-            break  # identical early stop
+            break 
 
         i, j, k = best_move
         if ({i, j, k} & current_wave_used):
