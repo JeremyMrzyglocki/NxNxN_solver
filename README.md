@@ -1,1 +1,2 @@
-Currently, the cube-state is translated into orbits. Orbits are expressed as a chain of 3-cycles. 3-cycles are translated into commutators.
+run python3 solver_v2_5.py for a solve without UI (change M=...) in the main-loop before.
+run python3 solver_v2_5_with_ui.py for a solve with UI. It will call solver_v2_5.py (change M=...) in the main-loop before.
