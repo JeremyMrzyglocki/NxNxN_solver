@@ -1096,18 +1096,17 @@ void sorting_via_sorting_network(string state){
 }
 
 
-void translate_and_flush_into_file(int orbit1, int orbit2) {
-    // Translate the data in the layers 1..5b into the the right format and flush into file.
-    ofstream o1("wave_1.txt");
-    ofstream o1b("wave_1b.txt");
-    ofstream o2("wave_2.txt");
-    ofstream o2b("wave_2b.txt");
-    ofstream o3("wave_3.txt");
-    ofstream o3b("wave_3b.txt");
-    ofstream o4("wave_4.txt");
-    ofstream o4b("wave_4b.txt");
-    ofstream o5("wave_5.txt");
-    ofstream o5b("wave_5b.txt");
+void translate_and_flush_into_file(int orbit1, int orbit2, const std::string& outdir) {
+    std::ofstream o1 (outdir + "/cycles_wave1.txt",  std::ios::app);
+    std::ofstream o1b(outdir + "/cycles_wave2.txt",  std::ios::app); 
+    std::ofstream o2 (outdir + "/cycles_wave3.txt",  std::ios::app);
+    std::ofstream o2b(outdir + "/cycles_wave4.txt",  std::ios::app);
+    std::ofstream o3 (outdir + "/cycles_wave5.txt",  std::ios::app);
+    std::ofstream o3b(outdir + "/cycles_wave6.txt",  std::ios::app);
+    std::ofstream o4 (outdir + "/cycles_wave7.txt",  std::ios::app);
+    std::ofstream o4b(outdir + "/cycles_wave8.txt",  std::ios::app);
+    std::ofstream o5 (outdir + "/cycles_wave9.txt",  std::ios::app);
+    std::ofstream o5b(outdir + "/cycles_wave10.txt", std::ios::app);
 
 
     for (const auto& cyc : layer_1) {
@@ -1293,6 +1292,7 @@ void translate_and_flush_into_file(int orbit1, int orbit2) {
     }
 }
 
+
 int main() {
     string state = random_state();
     cout << endl << "Find 3-cycles to solve via two-face-sorting-network-method" << endl << endl;
@@ -1300,6 +1300,53 @@ int main() {
     cout << endl;
     sorting_via_sorting_network(state);
     cout << endl;
-    translate_and_flush_into_file(1,3);
+    translate_and_flush_into_file(1,1, ".");
 }
+
+
+// int main(int argc, char** argv) {
+//     int M = 16;
+//     string state_path = "cube_state.txt";
+//     string outdir = ".";
+
+//     for (int i = 1; i < argc; ++i) {
+//         string a = argv[i];
+//         if (a == "--M" && i+1 < argc) M = std::stoi(argv[++i]);
+//         else if (a == "--state" && i+1 < argc) state_path = argv[++i];
+//         else if (a == "--outdir" && i+1 < argc) outdir = argv[++i];
+//     }
+
+//     std::map<std::pair<int,int>, std::string> orbit_state;
+//     {
+//         std::ifstream fin(state_path);
+//         std::string line;
+//         while (std::getline(fin, line)) {
+//             if (line.size() && line[0] == 'o') {
+//                 // line: "o a,b : <24 letters>"
+//                 size_t sp = line.find(' ');
+//                 size_t comma = line.find(',', sp+1);
+//                 size_t colon = line.find(':', comma+1);
+//                 int a = std::stoi(line.substr(sp+1, comma - (sp+1)));
+//                 int b = std::stoi(line.substr(comma+1, colon - (comma+1)));
+//                 size_t letters_pos = line.find_first_not_of(" \t", colon+1);
+//                 std::string letters = (letters_pos == std::string::npos) ? "" : line.substr(letters_pos);
+//                 if (letters.size() > 24) letters.resize(24);
+//                 orbit_state[{a,b}] = letters;
+//             }
+//         }
+//     }
+
+//     for (int a = 1; a <= M; ++a) {
+//         for (int b = 1; b <= M; ++b) {
+//             auto it = orbit_state.find({a,b});
+//             if (it == orbit_state.end() || it->second.size() != 24) continue; 
+//             std::string state = it->second;
+//             sorting_via_sorting_network(state);   // fills layer_1..layer_5b
+//             translate_and_flush_into_file(a, b, outdir);
+//         }
+//     }
+
+//     return 0;
+// }
+
 

@@ -5,7 +5,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QApplication, QLineEdit, QPushButton, QTextEdit, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtCore import QTimer
 from vispy import scene, app as vispy_app
-
 from solver_v2_5 import SolverV2_5 as Solver
 
 # ---- color dictionaries (same as your solver) ----
@@ -49,7 +48,7 @@ def create_state_matrix(M):
 
 
 class SolverUI(QtWidgets.QMainWindow):
-    def __init__(self, M=16, seed=123456, cell_size=2):
+    def __init__(self, M, seed=123456, cell_size=1):
         super().__init__()
         self.setWindowTitle("NxNxN Solver v2_5 — minimal UI")
         self.M = M
@@ -260,7 +259,7 @@ class SolverUI(QtWidgets.QMainWindow):
 
         t0 = time.time()
         try:
-            self.solver.run_pipeline(scramble=False)   # do no scramble again
+            self.solver.run_pipeline(scramble=False, mode="sorting_network")   # do no scramble again
             self.output.append(f"✅ Done. Outputs in: {self.solver.run_dir}")
         except Exception as e:
             self.output.append(f"✖ solver failed: {e}")
@@ -313,7 +312,7 @@ class SolverUI(QtWidgets.QMainWindow):
 
         if self._timer.isActive():
             self._timer.stop()
-        self._timer.start(20)  # ms per tick
+        self._timer.start(1)  # ms per tick
         self.output.append(f"▶️  Playing {len(self._moves)} moves …")
 
 
@@ -397,7 +396,7 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=15, seed=123456, cell_size=1)
+    win = SolverUI(M=100, seed=123456, cell_size=1)
     sys.exit(qapp.exec_())
 
 if __name__ == "__main__":

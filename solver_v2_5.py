@@ -257,49 +257,65 @@ class SolverV2_5:
         self.sw.stop("scramble")
 
 
-    def produce_full_plan(self):
+    def produce_full_plan(self, *, mode: str = "sorting_network"):
         self.sw.start("plan.total")
+        
+        if mode == "row_wise":
+            tiny_args = (
+                (a, b, tuple(self.baseline_subcell_color[(k, a, b)] for k in range(1, 25)))
+                for a in range(1, self.M+1)
+                for b in range(1, self.M+1)
+            )
 
-        tiny_args = (
-            (a, b, tuple(self.baseline_subcell_color[(k, a, b)] for k in range(1, 25)))
-            for a in range(1, self.M+1)
-            for b in range(1, self.M+1)
-        )
-
-        open_files = {}
-        with ProcessPoolExecutor() as exe:
-            t_map0 = perf_counter()
-            for wave_dict in exe.map(_compute_orbit_swap, tiny_args, chunksize=CHUNKSIZE):
-                # time spent waiting on/doing compute since last iteration
-                t_map1 = perf_counter()
-                self.sw.add("plan.compute", t_map1 - t_map0)
-
-                # write the current chunk
-                t_write0 = perf_counter()
-   
-                for w, lines in wave_dict.items():
-                    f = open_files.get(w)
-                    if f is None:
-                        p = self.run_dir / f"cycles_wave{w}.txt"
-                        f = p.open("w", encoding="utf-8")
-                        open_files[w] = f
-                    f.write("\n".join(lines))
-                    f.write("\n")
-                    
-                t_write1 = perf_counter()
-                self.sw.add("plan.write", t_write1 - t_write0)
-
-                # next compute window starts now
+            open_files = {}
+            with ProcessPoolExecutor() as exe:
                 t_map0 = perf_counter()
+                for wave_dict in exe.map(_compute_orbit_swap, tiny_args, chunksize=CHUNKSIZE):
+                    # time spent waiting on/doing compute since last iteration
+                    t_map1 = perf_counter()
+                    self.sw.add("plan.compute", t_map1 - t_map0)
 
-        # close any open files
-        for f in open_files.values():
-            try:
-                f.close()
-            except:
-                pass
+                    # write the current chunk
+                    t_write0 = perf_counter()
+    
+                    for w, lines in wave_dict.items():
+                        f = open_files.get(w)
+                        if f is None:
+                            p = self.run_dir / f"cycles_wave{w}.txt"
+                            f = p.open("w", encoding="utf-8")
+                            open_files[w] = f
+                        f.write("\n".join(lines))
+                        f.write("\n")
+                        
+                    t_write1 = perf_counter()
+                    self.sw.add("plan.write", t_write1 - t_write0)
 
+                    # next compute window starts now
+                    t_map0 = perf_counter()
+
+            # close any open files
+            for f in open_files.values():
+                try:
+                    f.close()
+                except:
+                    pass
+
+        elif mode == "sorting_network":
+            state_path = self.run_dir / "cube_state.txt"
+            exe = str(self.project_root / "compute_face_swap") 
+            cmd = [
+                exe,
+                "--M", str(self.M),
+                "--state", str(state_path),
+                "--outdir", str(self.run_dir)
+            ]
+            t0 = perf_counter()
+            proc = __import__("subprocess").run(cmd, capture_output=True, text=True)
+            t1 = perf_counter()
+            self.sw.add("plan.compute", t1 - t0)
+            
         self.sw.stop("plan.total")
+
 
 
 
@@ -368,7 +384,7 @@ class SolverV2_5:
                 f"(expand {t['expand_sec']:.3f}s, count {t['count_sec']:.3f}s, total {t['total_sec']:.3f}s)"
             )
 
-    def run_pipeline(self, *, scramble: bool = False):
+    def run_pipeline(self, *, scramble: bool = False, mode: str):
         t_pipeline0 = perf_counter()
         if scramble:
             self.scramble_all_orbits()
@@ -380,7 +396,7 @@ class SolverV2_5:
         self.sw.start("save_state")
         save_orbits_to_txt(self.subcell_color, self.M, str(self.run_dir / "cube_state.txt"))
         self.sw.stop("save_state")
-        self.produce_full_plan()
+        self.produce_full_plan(mode=mode)
         self.run_rearrange_and_count()
         total_time = perf_counter() - t_pipeline0
         print(f"\n✅ solver_v2_5 finished in {total_time:.2f}s")
@@ -405,5 +421,6 @@ class Stopwatch:
 
 # ---------- main ----------
 if __name__ == "__main__":
-    M = 1000 # N = 2M, only odd cubes supported by planner logic
-    SolverV2_5(M=M).run_pipeline(scramble=True)
+    M = 500 # N = 2M, only odd cubes supported by planner logic
+    SolverV2_5(M=M).run_pipeline(scramble=True, mode="row_wise")
+    
