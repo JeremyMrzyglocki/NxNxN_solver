@@ -5,6 +5,13 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
+#include <fstream>
+
+
+#include <map>
+#include <array>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
@@ -477,10 +484,13 @@ string compute_face_swap_full_orbit(const std::string& input, int face1, int fac
 }
 
 string random_state(){
-    string state = "000011112222333344445555";
+    //string state = "000011112222333344445555";
+    string state = "WWWWOOOOYYYYGGGGRRRRBBBB";
     shuffle(state.begin(), state.end(), std::mt19937(std::random_device{}()));
     return state;
 }
+
+
 
 
 
@@ -621,49 +631,42 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     else if (pattern == "22210110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
     else if (pattern == "22210101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
     else if (pattern == "22210011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    
     else if (pattern == "22121100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
     else if (pattern == "22121010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
     else if (pattern == "22121001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
     else if (pattern == "22120110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
     else if (pattern == "22120101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
     else if (pattern == "22120011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-
     else if (pattern == "21221100"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
     else if (pattern == "21221010"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
     else if (pattern == "21221001"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
     else if (pattern == "21220110"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
     else if (pattern == "21220101"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
     else if (pattern == "21220011"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-
     else if (pattern == "12221100"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,6,4, face1, face2, layer);}
     else if (pattern == "12221010"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
     else if (pattern == "12221001"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
     else if (pattern == "12220110"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
     else if (pattern == "12220101"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
     else if (pattern == "12220011"){add_cycle(2,7,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-
     else if (pattern == "22211100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
     else if (pattern == "22211010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
     else if (pattern == "22211001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
     else if (pattern == "22210110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
     else if (pattern == "22210101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
     else if (pattern == "22210011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-
     else if (pattern == "22121100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
     else if (pattern == "22121010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
     else if (pattern == "22121001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
     else if (pattern == "22120110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
     else if (pattern == "22120101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
     else if (pattern == "22120011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-
     else if (pattern == "21221100"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
     else if (pattern == "21221010"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
     else if (pattern == "21221001"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
     else if (pattern == "21220110"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
     else if (pattern == "21220101"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
     else if (pattern == "21220011"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-
     else if (pattern == "12221100"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,6,4, face1, face2, layer);}
     else if (pattern == "12221010"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
     else if (pattern == "12221001"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
@@ -671,6 +674,59 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     else if (pattern == "12220101"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
     else if (pattern == "12220011"){add_cycle(2,7,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
     
+
+
+    else if (pattern == "11002221"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
+    else if (pattern == "10102221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
+    else if (pattern == "10012221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
+    else if (pattern == "01102221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
+    else if (pattern == "01012221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
+    else if (pattern == "00112221"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,8,2, face1, face2, layer);}
+
+    else if (pattern == "11002212"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
+    else if (pattern == "10102212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
+    else if (pattern == "10012212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
+    else if (pattern == "01102212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
+    else if (pattern == "01012212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
+    else if (pattern == "00112212"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
+    else if (pattern == "11002122"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
+    else if (pattern == "10102122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
+    else if (pattern == "10012122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
+    else if (pattern == "01102122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
+    else if (pattern == "01012122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
+    else if (pattern == "00112122"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);}
+    else if (pattern == "11001222"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,5,4, face1, face2, layer);}
+    else if (pattern == "10101222"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
+    else if (pattern == "10011222"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
+    else if (pattern == "01101222"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
+    else if (pattern == "01011222"){add_cycle(2,6,1, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
+    else if (pattern == "00111222"){add_cycle(3,6,1, face1, face2, layer); add_cycle(4,5,2, face1, face2, layer);}
+    else if (pattern == "11002221"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
+    else if (pattern == "10102221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
+    else if (pattern == "10012221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
+    else if (pattern == "01102221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
+    else if (pattern == "01012221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
+    else if (pattern == "00112221"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,8,2, face1, face2, layer);}
+    else if (pattern == "11002212"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
+    else if (pattern == "10102212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
+    else if (pattern == "10012212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
+    else if (pattern == "01102212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
+    else if (pattern == "01012212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
+    else if (pattern == "00112212"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
+    else if (pattern == "11002122"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
+    else if (pattern == "10102122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
+    else if (pattern == "10012122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
+    else if (pattern == "01102122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
+    else if (pattern == "01012122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
+    else if (pattern == "00112122"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);}
+    else if (pattern == "11001222"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,5,4, face1, face2, layer);}
+    else if (pattern == "10101222"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
+    else if (pattern == "10011222"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
+    else if (pattern == "01101222"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
+    else if (pattern == "01011222"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
+    else if (pattern == "00111222"){add_cycle(3,6,1, face1, face2, layer); add_cycle(4,5,2, face1, face2, layer);}
+
+
     // two twos and a one + two ones
 
     else if (pattern == "22101100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
@@ -866,7 +922,6 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     else if (pattern == "11011011"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
     else if (pattern == "11010111"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
  
-
     // 4-4 swap
     else if (pattern == "11111111"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5); add_cycle(3,8,4, face1, face2, layer+5);} 
 
@@ -877,7 +932,6 @@ void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer
     }
     
 
-    //if (pattern == "11101110"){return string("arot(1,5,4) + arot(2,6,1) arot(3,7,4)");}
 
 }
 }
@@ -909,7 +963,7 @@ void apply_cycles(std::string& state, const std::vector<std::vector<int>>& cycle
 }
 
 void print_state(string state){
-    cout << "State:";
+    cout << "State: ";
     for (size_t i = 0; i < state.size(); ++i) {
         cout << state[i];
         if ((i + 1) % 4 == 0 && i + 1 != state.size()) {
@@ -919,8 +973,24 @@ void print_state(string state){
 }
 
 void sorting_via_sorting_network(string state){
-    cout << endl << endl << "Layer 1:" << endl;
-    layer_1.clear();   
+
+    for (size_t i = 0; i < 24; ++i) { 
+        switch (state[i]) {
+            case 'W': state[i] = '0'; break;
+            case 'O': state[i] = '1'; break;
+            case 'Y': state[i] = '2'; break;
+            case 'G': state[i] = '3'; break;
+            case 'R': state[i] = '4'; break;
+            case 'B': state[i] = '5'; break;
+            default: break;
+        }
+    }
+    cout << "Numeric representation of the state:" << endl;
+    print_state(state);
+    cout << endl;
+
+    cout << endl << "Layer 1:" << endl;
+    layer_1.clear();
     layer_1b.clear();
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 5), 0, 5, 1);
     mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 3), 1, 3, 1);
@@ -1025,15 +1095,211 @@ void sorting_via_sorting_network(string state){
 
 }
 
+
+void translate_and_flush_into_file(int orbit1, int orbit2) {
+    // Translate the data in the layers 1..5b into the the right format and flush into file.
+    ofstream o1("wave_1.txt");
+    ofstream o1b("wave_1b.txt");
+    ofstream o2("wave_2.txt");
+    ofstream o2b("wave_2b.txt");
+    ofstream o3("wave_3.txt");
+    ofstream o3b("wave_3b.txt");
+    ofstream o4("wave_4.txt");
+    ofstream o4b("wave_4b.txt");
+    ofstream o5("wave_5.txt");
+    ofstream o5b("wave_5b.txt");
+
+
+    for (const auto& cyc : layer_1) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 0 && cyc[4] == 5) {
+            if (cyc[0] >= 5) {a = 16; } else { a = 0; }
+            if (cyc[1] >= 5) {b = 16; } else { b = 0; }
+            if (cyc[2] >= 5) {c = 16; } else { c = 0; }
+        }
+        else if (cyc[3] == 1 && cyc[4] == 3) {
+            if (cyc[0] >= 5) {a = 8; } else { a = 4; }
+            if (cyc[1] >= 5) {b = 8; } else { b = 4; }
+            if (cyc[2] >= 5) {c = 8; } else { c = 4; }
+        }
+        else if (cyc[3] == 2 && cyc[4] == 4) {
+            if (cyc[0] >= 5) {a = 12; } else { a = 8; }
+            if (cyc[1] >= 5) {b = 12; } else { b = 8; }
+            if (cyc[2] >= 5) {c = 12; } else { c = 8; }
+        }
+        o1 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+
+    for (const auto& cyc : layer_1b) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 0 && cyc[4] == 5) {
+            if (cyc[0] >= 5) {a = 16; } else { a = 0; }
+            if (cyc[1] >= 5) {b = 16; } else { b = 0; }
+            if (cyc[2] >= 5) {c = 16; } else { c = 0; }
+        }
+        else if (cyc[3] == 1 && cyc[4] == 3) {
+            if (cyc[0] >= 5) {a = 8; } else { a = 4; }
+            if (cyc[1] >= 5) {b = 8; } else { b = 4; }
+            if (cyc[2] >= 5) {c = 8; } else { c = 4; }
+        }
+        else if (cyc[3] == 2 && cyc[4] == 4) {
+            if (cyc[0] >= 5) {a = 12; } else { a = 8; }
+            if (cyc[1] >= 5) {b = 12; } else { b = 8; }
+            if (cyc[2] >= 5) {c = 12; } else { c = 8; }
+        }
+        o1b << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+
+    for (const auto& cyc : layer_2) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 1 && cyc[4] == 2) {
+            if (cyc[0] >= 5) {a = 4; } else { a = 4; }
+            if (cyc[1] >= 5) {b = 4; } else { b = 4; }
+            if (cyc[2] >= 5) {c = 4; } else { c = 4; }
+        }
+        else if (cyc[3] == 3 && cyc[4] == 4) {
+            if (cyc[0] >= 5) {a = 12; } else { a = 12; }
+            if (cyc[1] >= 5) {b = 12; } else { b = 12; }
+            if (cyc[2] >= 5) {c = 12; } else { c = 12; }
+        }
+        o2 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_2b) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 1 && cyc[4] == 2) {
+            if (cyc[0] >= 5) {a = 4; } else { a = 4; }
+            if (cyc[1] >= 5) {b = 4; } else { b = 4; }
+            if (cyc[2] >= 5) {c = 4; } else { c = 4; }
+        }
+        else if (cyc[3] == 3 && cyc[4] == 4) {
+            if (cyc[0] >= 5) {a = 12; } else { a = 12; }
+            if (cyc[1] >= 5) {b = 12; } else { b = 12; }
+            if (cyc[2] >= 5) {c = 12; } else { c = 12; }
+        }
+        o2b << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_3) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 0 && cyc[4] == 3) {
+            if (cyc[0] >= 5) {a = 8; } else { a = 0; }
+            if (cyc[1] >= 5) {b = 8; } else { b = 0; }
+            if (cyc[2] >= 5) {c = 8; } else { c = 0; }
+        }
+        else if (cyc[3] == 2 && cyc[4] == 5) {
+            if (cyc[0] >= 5) {a = 16; } else { a = 8; }
+            if (cyc[1] >= 5) {b = 16; } else { b = 8; }
+            if (cyc[2] >= 5) {c = 16; } else { c = 8; }
+        }
+        o3 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_3b) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 0 && cyc[4] == 3) {
+            if (cyc[0] >= 5) {a = 8; } else { a = 0; }
+            if (cyc[1] >= 5) {b = 8; } else { b = 0; }
+            if (cyc[2] >= 5) {c = 8; } else { c = 0; }
+        }
+        else if (cyc[3] == 2 && cyc[4] == 5) {
+            if (cyc[0] >= 5) {a = 16; } else { a = 8; }
+            if (cyc[1] >= 5) {b = 16; } else { b = 8; }
+            if (cyc[2] >= 5) {c = 16; } else { c = 8; }
+        }
+        o3b << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_4) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 0 && cyc[4] == 1) {
+            if (cyc[0] >= 5) {a = 0; } else { a = 0; }
+            if (cyc[1] >= 5) {b = 0; } else { b = 0; }
+            if (cyc[2] >= 5) {c = 0; } else { c = 0; }
+        }
+        else if (cyc[3] == 2 && cyc[4] == 3) {
+            if (cyc[0] >= 5) {a = 8; } else { a = 8; }
+            if (cyc[1] >= 5) {b = 8; } else { b = 8; }
+            if (cyc[2] >= 5) {c = 8; } else { c = 8; }
+        }
+        else if (cyc[3] == 4 && cyc[4] == 5) {
+            if (cyc[0] >= 5) {a = 16; } else { a = 16; }
+            if (cyc[1] >= 5) {b = 16; } else { b = 16; }
+            if (cyc[2] >= 5) {c = 16; } else { c = 16; }
+        }
+        o4 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_4b) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 0 && cyc[4] == 1) {
+            if (cyc[0] >= 5) {a = 0; } else { a = 0; }
+            if (cyc[1] >= 5) {b = 0; } else { b = 0; }
+            if (cyc[2] >= 5) {c = 0; } else { c = 0; }
+        }
+        else if (cyc[3] == 2 && cyc[4] == 3) {
+            if (cyc[0] >= 5) {a = 8; } else { a = 8; }
+            if (cyc[1] >= 5) {b = 8; } else { b = 8; }
+            if (cyc[2] >= 5) {c = 8; } else { c = 8; }
+        }
+        else if (cyc[3] == 4 && cyc[4] == 5) {
+            if (cyc[0] >= 5) {a = 16; } else { a = 16; }
+            if (cyc[1] >= 5) {b = 16; } else { b = 16; }
+            if (cyc[2] >= 5) {c = 16; } else { c = 16; }
+        }
+        o4b << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_5) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 1 && cyc[4] == 2) {
+            if (cyc[0] >= 5) {a = 4; } else { a = 4; }
+            if (cyc[1] >= 5) {b = 4; } else { b = 4; }
+            if (cyc[2] >= 5) {c = 4; } else { c = 4; }
+        }
+        else if (cyc[3] == 3 && cyc[4] == 4) {
+            if (cyc[0] >= 5) {a = 12; } else { a = 12; }
+            if (cyc[1] >= 5) {b = 12; } else { b = 12; }
+            if (cyc[2] >= 5) {c = 12; } else { c = 12; }
+        }
+        o5 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+
+    for (const auto& cyc : layer_5b) {
+        int a = 0; int b = 0; int c = 0;
+        if (cyc[3] == 1 && cyc[4] == 2) {
+            if (cyc[0] >= 5) {a = 4; } else { a = 4; }
+            if (cyc[1] >= 5) {b = 4; } else { b = 4; }
+            if (cyc[2] >= 5) {c = 4; } else { c = 4; }
+        }
+        else if (cyc[3] == 3 && cyc[4] == 4) {
+            if (cyc[0] >= 5) {a = 12; } else { a = 12; }
+            if (cyc[1] >= 5) {b = 12; } else { b = 12; }
+            if (cyc[2] >= 5) {c = 12; } else { c = 12; }
+        }
+        o5b << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+
+    }
+}
+
 int main() {
-    //string state = "314532423403512051412005";
     string state = random_state();
-    //string state = "012353040242541131435205";
-
-
     cout << endl << "Find 3-cycles to solve via two-face-sorting-network-method" << endl << endl;
     print_state(state);
     cout << endl;
     sorting_via_sorting_network(state);
     cout << endl;
+    translate_and_flush_into_file(1,3);
 }
+
