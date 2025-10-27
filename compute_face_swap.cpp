@@ -492,597 +492,168 @@ string random_state(){
     return state;
 }
 
-
-void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer){ {
-
-    if (pattern == "00000000"){}
-    else if (pattern == "10001000"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "10000100"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "10000010"){add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "10000001"){add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "01001000"){add_cycle(2,5,1, face1, face2, layer);}  // I am here chosing to use the inverse of the first case, because I have free choice anyways and to be able to abuse some modulo-3 tricks later on
-    else if (pattern == "01000100"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "01000010"){add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "01000001"){add_cycle(2,8,1, face1, face2, layer);}
-    else if (pattern == "00101000"){add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "00100100"){add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "00100010"){add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "00100001"){add_cycle(3,8,1, face1, face2, layer);}
-    else if (pattern == "00011000"){add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "00010100"){add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "00010010"){add_cycle(4,7,1, face1, face2, layer);}
-    else if (pattern == "00010001"){add_cycle(4,8,1, face1, face2, layer);}
-
-    else if (pattern == "11001100"){add_cycle(1,5,3, face1, face2, layer), add_cycle(2,6,4, face1, face2, layer);} // we take 3 and 4 as cycle-independant buffers
-    else if (pattern == "11001010"){add_cycle(1,5,3, face1, face2, layer), add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "11001001"){add_cycle(1,5,3, face1, face2, layer), add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "11000110"){add_cycle(1,6,3, face1, face2, layer), add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "11000101"){add_cycle(1,6,3, face1, face2, layer), add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "11000011"){add_cycle(1,7,3, face1, face2, layer), add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "10101100"){add_cycle(1,5,2, face1, face2, layer), add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "10101010"){add_cycle(1,5,2, face1, face2, layer), add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "10101001"){add_cycle(1,5,2, face1, face2, layer), add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10100110"){add_cycle(1,6,2, face1, face2, layer), add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "10100101"){add_cycle(1,6,2, face1, face2, layer), add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10100011"){add_cycle(1,7,2, face1, face2, layer), add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10011100"){add_cycle(1,5,2, face1, face2, layer), add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "10011010"){add_cycle(1,5,2, face1, face2, layer), add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "10011001"){add_cycle(1,5,2, face1, face2, layer), add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "10010110"){add_cycle(1,6,2, face1, face2, layer), add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "10010101"){add_cycle(1,6,2, face1, face2, layer), add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "10010011"){add_cycle(1,7,2, face1, face2, layer), add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01101100"){add_cycle(2,5,1, face1, face2, layer), add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "01101010"){add_cycle(2,5,1, face1, face2, layer), add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "01101001"){add_cycle(2,5,1, face1, face2, layer), add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "01100110"){add_cycle(2,6,1, face1, face2, layer), add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "01100101"){add_cycle(2,6,1, face1, face2, layer), add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "01100011"){add_cycle(2,7,1, face1, face2, layer), add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "01011100"){add_cycle(2,5,1, face1, face2, layer), add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "01011010"){add_cycle(2,5,1, face1, face2, layer), add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "01011001"){add_cycle(2,5,1, face1, face2, layer), add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01010110"){add_cycle(2,6,1, face1, face2, layer), add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "01010101"){add_cycle(2,6,1, face1, face2, layer), add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01010011"){add_cycle(2,7,1, face1, face2, layer), add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "00111100"){add_cycle(3,5,1, face1, face2, layer), add_cycle(4,6,2, face1, face2, layer);}
-    else if (pattern == "00111010"){add_cycle(3,5,1, face1, face2, layer), add_cycle(4,7,2, face1, face2, layer);}
-    else if (pattern == "00111001"){add_cycle(3,5,1, face1, face2, layer), add_cycle(4,8,2, face1, face2, layer);}
-    else if (pattern == "00110110"){add_cycle(3,6,1, face1, face2, layer), add_cycle(4,7,2, face1, face2, layer);}
-    else if (pattern == "00110101"){add_cycle(3,6,1, face1, face2, layer), add_cycle(4,8,2, face1, face2, layer);}
-    else if (pattern == "00110011"){add_cycle(3,7,1, face1, face2, layer), add_cycle(4,8,2, face1, face2, layer);}
-
-    else if (pattern == "10002200"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "10002020"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "10002002"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "01002200"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "01002020"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "01002002"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "00102200"){add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "00102020"){add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "00102002"){add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "00012200"){add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "00012020"){add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "00012002"){add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "10000220"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "10000202"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "10000022"){add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "01000220"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "01000202"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "01000022"){add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "00100220"){add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "00100202"){add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "00100022"){add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "00010220"){add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "00010202"){add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "00010022"){add_cycle(4,7,1, face1, face2, layer);}
-    else if (pattern == "22001000"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "20201000"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "20021000"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "22000100"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "20200100"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "20020100"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "22000010"){add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "20200010"){add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "20020010"){add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "22000001"){add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "20200001"){add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "20020001"){add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "02201000"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "02021000"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "00221000"){add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "02200100"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "02020100"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "00220100"){add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "02200010"){add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "02020010"){add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "00220010"){add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "02200001"){add_cycle(2,8,1, face1, face2, layer);}
-    else if (pattern == "02020001"){add_cycle(2,8,1, face1, face2, layer);}
-    else if (pattern == "00220001"){add_cycle(3,8,1, face1, face2, layer);}
-
-    // three twos and one one 
-
-    else if (pattern == "22201000" || pattern == "22021000" || pattern == "20221000"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "22200100" || pattern == "22020100" || pattern == "20220100"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "22200010" || pattern == "22020010" || pattern == "20220010"){add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "22200001" || pattern == "22020001" || pattern == "20220001"){add_cycle(1,8,2, face1, face2, layer);}
-
-    else if (pattern == "02221000"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "02220100"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "02220010"){add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "02220001"){add_cycle(2,8,1, face1, face2, layer);}
-
-
-    else if (pattern == "10002220" || pattern == "10002202" || pattern == "10002022"){add_cycle(1,5,2, face1, face2, layer);}
-    else if (pattern == "01002220" || pattern == "01002202" || pattern == "01002022"){add_cycle(2,5,1, face1, face2, layer);}
-    else if (pattern == "00102220" || pattern == "00102202" || pattern == "00102022"){add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "00012220" || pattern == "00012202" || pattern == "00012022"){add_cycle(4,5,1, face1, face2, layer);}
-
-    else if (pattern == "10000222"){add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "01000222"){add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "00100222"){add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "00010222"){add_cycle(4,6,1, face1, face2, layer);}
-
-    // three twos and three ones
-
-    else if (pattern == "22211100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "22211010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "22211001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "22210110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
-    else if (pattern == "22210101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "22210011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "22121100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "22121010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "22121001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "22120110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "22120101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "22120011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "21221100"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "21221010"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "21221001"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "21220110"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "21220101"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "21220011"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "12221100"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,6,4, face1, face2, layer);}
-    else if (pattern == "12221010"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
-    else if (pattern == "12221001"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-    else if (pattern == "12220110"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
-    else if (pattern == "12220101"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-    else if (pattern == "12220011"){add_cycle(2,7,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-
-
-    //
-
-    else if (pattern == "11002221"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "10102221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10012221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01102221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "01012221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "00112221"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,8,2, face1, face2, layer);}
-
-    else if (pattern == "11002212"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "10102212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "10012212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "01102212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "01012212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "00112212"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
-    else if (pattern == "11002122"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "10102122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "10012122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "01102122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "01012122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "00112122"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);}
-    else if (pattern == "11001222"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,5,4, face1, face2, layer);}
-    else if (pattern == "10101222"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
-    else if (pattern == "10011222"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
-    else if (pattern == "01101222"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
-    else if (pattern == "01011222"){add_cycle(2,6,1, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
-    else if (pattern == "00111222"){add_cycle(3,6,1, face1, face2, layer); add_cycle(4,5,2, face1, face2, layer);}
-
-
-
-
-    // two twos and a one + two ones
-
-    else if (pattern == "22101100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "22101010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "22101001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "22100110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "22100101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "22100011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-
-    else if (pattern == "22011100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "22011010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "22011001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "22010110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "22010101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "22010011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-
-    else if (pattern == "21201100"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "21201010"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "21201001"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "21200110"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "21200101"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "21200011"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-
-    else if (pattern == "20211100"){add_cycle(1,5,3, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);}
-    else if (pattern == "20211010"){add_cycle(1,5,3, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
-    else if (pattern == "20211001"){add_cycle(1,5,3, face1, face2, layer); add_cycle(4,8,2, face1, face2, layer);}
-    else if (pattern == "20210110"){add_cycle(1,6,3, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
-    else if (pattern == "20210101"){add_cycle(1,6,3, face1, face2, layer); add_cycle(4,8,2, face1, face2, layer);}
-    else if (pattern == "20210011"){add_cycle(1,7,3, face1, face2, layer); add_cycle(4,8,2, face1, face2, layer);}
-
-    else if (pattern == "20121100"){add_cycle(1,5,4, face1, face2, layer); add_cycle(3,6,2, face1, face2, layer);}
-    else if (pattern == "20121010"){add_cycle(1,5,4, face1, face2, layer); add_cycle(3,7,2, face1, face2, layer);}
-    else if (pattern == "20121001"){add_cycle(1,5,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer);}
-    else if (pattern == "20120110"){add_cycle(1,6,4, face1, face2, layer); add_cycle(3,7,2, face1, face2, layer);}
-    else if (pattern == "20120101"){add_cycle(1,6,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer);}
-    else if (pattern == "20120011"){add_cycle(1,7,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer);}
-
-    else if (pattern == "21021100"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "21021010"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "21021001"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "21020110"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "21020101"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "21020011"){add_cycle(1,7,4, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-
-
-    else if (pattern == "02211100"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "02211010"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer);}
-    else if (pattern == "02211001"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-    else if (pattern == "02210110"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer);}
-    else if (pattern == "02210101"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-    else if (pattern == "02210011"){add_cycle(2,7,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-
-    else if (pattern == "12201100"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,6,4, face1, face2, layer);}
-    else if (pattern == "12201010"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
-    else if (pattern == "12201001"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-    else if (pattern == "12200110"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer);}
-    else if (pattern == "12200101"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-    else if (pattern == "12200011"){add_cycle(2,7,3, face1, face2, layer); add_cycle(1,8,4, face1, face2, layer);}
-
-    else if (pattern == "02121100"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "02121010"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "02121001"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer);}
-    else if (pattern == "02120110"){add_cycle(2,6,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "02120101"){add_cycle(2,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer);}
-    else if (pattern == "02120011"){add_cycle(2,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer);}
-
-    else if (pattern == "12021100"){add_cycle(2,5,4, face1, face2, layer); add_cycle(1,6,3, face1, face2, layer);}
-    else if (pattern == "12021010"){add_cycle(2,5,4, face1, face2, layer); add_cycle(1,7,3, face1, face2, layer);}
-    else if (pattern == "12021001"){add_cycle(2,5,4, face1, face2, layer); add_cycle(1,8,3, face1, face2, layer);}
-    else if (pattern == "12020110"){add_cycle(2,6,4, face1, face2, layer); add_cycle(1,7,3, face1, face2, layer);}
-    else if (pattern == "12020101"){add_cycle(2,6,4, face1, face2, layer); add_cycle(1,8,3, face1, face2, layer);}
-    else if (pattern == "12020011"){add_cycle(2,7,4, face1, face2, layer); add_cycle(1,8,3, face1, face2, layer);}
-
-    else if (pattern == "01221100"){add_cycle(3,5,4, face1, face2, layer); add_cycle(2,6,1, face1, face2, layer);}
-    else if (pattern == "01221010"){add_cycle(3,5,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "01221001"){add_cycle(3,5,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer);}
-    else if (pattern == "01220110"){add_cycle(3,6,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer);}
-    else if (pattern == "01220101"){add_cycle(3,6,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer);}
-    else if (pattern == "01220011"){add_cycle(3,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer);}
-
-    else if (pattern == "10221100"){add_cycle(3,5,4, face1, face2, layer); add_cycle(1,6,2, face1, face2, layer);}
-    else if (pattern == "10221010"){add_cycle(3,5,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "10221001"){add_cycle(3,5,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "10220110"){add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer);}
-    else if (pattern == "10220101"){add_cycle(3,6,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "10220011"){add_cycle(3,7,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer);}
-
-    // might also contain errors
-
-    else if (pattern == "11002210"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "10102210"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "10012210"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "01102210"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "01012210"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer);}
-    else if (pattern == "00112210"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);} // fixed
-
-    else if (pattern == "11002201"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "10102201"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10012201"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01102201"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer);}
-    else if (pattern == "01012201"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-    else if (pattern == "00112201"){add_cycle(3,5,4, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-
-    else if (pattern == "11002120"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "10102120"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "10012120"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "01102120"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "01012120"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "00112120"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);}
-
-    else if (pattern == "11002021"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "10102021"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10012021"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01102021"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer);}
-    else if (pattern == "01012021"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-    else if (pattern == "00112021"){add_cycle(3,5,4, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-
-    else if (pattern == "11002012"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "10102012"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "10012012"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "01102012"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer);}
-    else if (pattern == "01012012"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer);}
-    else if (pattern == "00112012"){add_cycle(3,5,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer);}
-
-    else if (pattern == "11002102"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "10102102"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "10012102"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "01102102"){add_cycle(2,5,4, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "01012102"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "00112102"){add_cycle(3,5,4, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer);}
-
-    else if (pattern == "11000221"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);}
-    else if (pattern == "10100221"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "10010221"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);}
-    else if (pattern == "01100221"){add_cycle(2,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer);}
-    else if (pattern == "01010221"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-    else if (pattern == "00110221"){add_cycle(3,6,4, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer);}
-
-    else if (pattern == "11001220"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,5,4, face1, face2, layer);}
-    else if (pattern == "10101220"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
-    else if (pattern == "10011220"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
-    else if (pattern == "01101220"){add_cycle(2,6,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "01011220"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "00111220"){add_cycle(3,6,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer);}
-
-    else if (pattern == "11000212"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);}
-    else if (pattern == "10100212"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "10010212"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "01100212"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "01010212"){add_cycle(2,6,1, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);}
-    else if (pattern == "00110212"){add_cycle(3,6,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
-
-    else if (pattern == "11001202"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,5,4, face1, face2, layer);}
-    else if (pattern == "10101202"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
-    else if (pattern == "10011202"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
-    else if (pattern == "01101202"){add_cycle(2,6,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "01011202"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "00111202"){add_cycle(3,6,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer);}
-
-    else if (pattern == "11000122"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    else if (pattern == "10100122"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "10010122"){add_cycle(1,7,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "01100122"){add_cycle(2,7,4, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer);}
-    else if (pattern == "01010122"){add_cycle(2,7,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer);}
-    else if (pattern == "00110122"){add_cycle(3,7,4, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer);}
-
-    else if (pattern == "11001022"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,5,4, face1, face2, layer);}
-    else if (pattern == "10101022"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,5,4, face1, face2, layer);}
-    else if (pattern == "10011022"){add_cycle(1,7,2, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
-    else if (pattern == "01101022"){add_cycle(2,7,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer);}
-    else if (pattern == "01011022"){add_cycle(2,7,1, face1, face2, layer); add_cycle(4,5,3, face1, face2, layer);}
-    else if (pattern == "00111022"){add_cycle(3,7,1, face1, face2, layer); add_cycle(4,5,2, face1, face2, layer);}
-
-    // 3-3 swaps (only "ones")
-
-    else if (pattern == "11101110"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);} 
-    else if (pattern == "11101101"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-    else if (pattern == "11101011"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-    else if (pattern == "11100111"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-
-    else if (pattern == "01111110"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,2, face1, face2, layer+5);} 
-    else if (pattern == "01111101"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer+5);} 
-    else if (pattern == "01111011"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer+5);} 
-    else if (pattern == "01110111"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,2, face1, face2, layer+5);} 
-
-    else if (pattern == "10111110"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);} 
-    else if (pattern == "10111101"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "10111011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "10110111"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    
-    else if (pattern == "11011110"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);} 
-    else if (pattern == "11011101"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-    else if (pattern == "11011011"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-    else if (pattern == "11010111"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-
-    // three 3's and two 1's:
-    else if (pattern == "11003330"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);} 
-    else if (pattern == "11003303"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);} 
-    else if (pattern == "11003033"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);} 
-    else if (pattern == "11000333"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);} 
-
-    else if (pattern == "10103330"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);} 
-    else if (pattern == "10103303"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);} 
-    else if (pattern == "10103033"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);} 
-    else if (pattern == "10100333"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);} 
-
-    else if (pattern == "10013330"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);} 
-    else if (pattern == "10013303"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);} 
-    else if (pattern == "10013033"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
-    else if (pattern == "10010333"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
-
-    else if (pattern == "01103330"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);} 
-    else if (pattern == "01103303"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);} 
-    else if (pattern == "01103033"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);} 
-    else if (pattern == "01100333"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);} 
-
-    else if (pattern == "01013330"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);} 
-    else if (pattern == "01013303"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);} 
-    else if (pattern == "01013033"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
-    else if (pattern == "01010333"){add_cycle(2,6,1, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer);} 
-
-    else if (pattern == "00113330"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);} 
-    else if (pattern == "00113303"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);} 
-    else if (pattern == "00113033"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);} 
-    else if (pattern == "00110333"){add_cycle(3,6,1, face1, face2, layer); add_cycle(4,7,2, face1, face2, layer);}
-    
-
-    else if (pattern == "33301100"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer);} 
-    else if (pattern == "33031100"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);} 
-    else if (pattern == "30331100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);} 
-    else if (pattern == "03331100"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);} 
-    else if (pattern == "33301010"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer);} 
-    else if (pattern == "33031010"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);} 
-    else if (pattern == "30331010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);} 
-    else if (pattern == "03331010"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);} 
-    else if (pattern == "33301001"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,8,3, face1, face2, layer);} 
-    else if (pattern == "33031001"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);} 
-    else if (pattern == "30331001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);} 
-    else if (pattern == "03331001"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);} 
-    else if (pattern == "33300110"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer);} 
-    else if (pattern == "33030110"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);} 
-    else if (pattern == "30330110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer);} 
-    else if (pattern == "03330110"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);} 
-    else if (pattern == "33300101"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,8,3, face1, face2, layer);} 
-    else if (pattern == "33030101"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);} 
-    else if (pattern == "30330101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);} 
-    else if (pattern == "03330101"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);} 
-    else if (pattern == "33300011"){add_cycle(1,7,4, face1, face2, layer); add_cycle(2,8,3, face1, face2, layer);} 
-    else if (pattern == "33030011"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer);} 
-    else if (pattern == "30330011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(4,8,3, face1, face2, layer);} 
-    else if (pattern == "03330011"){add_cycle(2,7,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);} 
-
-    // 01111221
-    // 3 1's and 2 1's + 2 2's like: 1110 1122
-
-
-
-    // make new:
-
-    else if (pattern == "11101122"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);}
-    else if (pattern == "11101212"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer+5);}
-    else if (pattern == "11101221"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,8,3, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);}
-    else if (pattern == "11102112"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);}
-    else if (pattern == "11102121"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,8,3, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);}
-    else if (pattern == "11102211"){add_cycle(1,7,4, face1, face2, layer); add_cycle(2,8,3, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);}
-    else if (pattern == "11011122"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "11011212"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer+5);}
-    else if (pattern == "11011221"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "11012112"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer+5);}
-    else if (pattern == "11012121"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer+5);}
-    else if (pattern == "11012211"){add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer+5);}
-    else if (pattern == "10111122"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "10111212"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer+5);}
-    else if (pattern == "10111221"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "10112112"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer+5);}
-    else if (pattern == "10112121"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer+5);}
-    else if (pattern == "10112211"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer); add_cycle(4,5,1, face1, face2, layer+5);}
-    else if (pattern == "01111122"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "01111212"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer+5);}
-    else if (pattern == "01111221"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);}
-    else if (pattern == "01112112"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);}
-    else if (pattern == "01112121"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);}
-    else if (pattern == "01112211"){add_cycle(2,7,1, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);}
-    else if (pattern == "11221110"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5);}
-    else if (pattern == "12121110"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5);}
-    else if (pattern == "12211110"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5);}
-    else if (pattern == "21121110"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);}
-    else if (pattern == "21211110"){add_cycle(2,5,4, face1, face2, layer); add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);}
-    else if (pattern == "22111110"){add_cycle(3,5,4, face1, face2, layer); add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);}
-    else if (pattern == "11221101"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "12121101"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "12211101"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "21121101"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,6,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} // corrected now
-    else if (pattern == "21211101"){add_cycle(2,5,4, face1, face2, layer); add_cycle(1,6,3, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "22111101"){add_cycle(3,5,4, face1, face2, layer); add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);}
-    else if (pattern == "11221011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "12121011"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "12211011"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "21121011"){add_cycle(2,5,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "21211011"){add_cycle(2,5,4, face1, face2, layer); add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "22111011"){add_cycle(3,5,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "11220111"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "12120111"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "12210111"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "21120111"){add_cycle(2,6,3, face1, face2, layer); add_cycle(1,7,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "21210111"){add_cycle(2,6,4, face1, face2, layer); add_cycle(1,7,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-    else if (pattern == "22110111"){add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);}
-
-
-    //...
-
-    // 3 1's and 1 1's + 3 3's 
-
-    else if (pattern == "11103331"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-    else if (pattern == "11103313"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,6,3, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);} 
-    else if (pattern == "11103133"){add_cycle(1,5,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,6,1, face1, face2, layer+5);} 
-    else if (pattern == "11101333"){add_cycle(1,6,4, face1, face2, layer); add_cycle(2,7,3, face1, face2, layer); add_cycle(2,5,1, face1, face2, layer+5);} 
-
-    else if (pattern == "11013331"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(2,8,1, face1, face2, layer+5);} 
-    else if (pattern == "11013313"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);} 
-    else if (pattern == "11013133"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,6,1, face1, face2, layer+5);} 
-    else if (pattern == "11011333"){add_cycle(1,6,3, face1, face2, layer); add_cycle(2,7,4, face1, face2, layer); add_cycle(2,5,1, face1, face2, layer+5);}
-    else if (pattern == "10113331"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "10113313"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);} 
-    else if (pattern == "10113133"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer+5);} 
-    else if (pattern == "10111333"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);} 
-    else if (pattern == "01113331"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "01113313"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);} 
-    else if (pattern == "01113133"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,6,1, face1, face2, layer+5);} 
-    else if (pattern == "01111333"){add_cycle(2,6,1, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,5,1, face1, face2, layer+5);} 
-
-    else if (pattern == "33311110"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,7,1, face1, face2, layer+5);} 
-    else if (pattern == "33131110"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);} 
-    else if (pattern == "31331110"){add_cycle(1,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);} 
-    else if (pattern == "13331110"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);} 
-    else if (pattern == "33311101"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "33131101"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);}  
-    else if (pattern == "31331101"){add_cycle(1,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);}  
-    else if (pattern == "13331101"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,6,1, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);}  
-    else if (pattern == "33311011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "33131011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);}  
-    else if (pattern == "31331011"){add_cycle(1,5,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);}  
-    else if (pattern == "13331011"){add_cycle(2,5,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);}  
-    else if (pattern == "33310111"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(3,8,1, face1, face2, layer+5);} 
-    else if (pattern == "33130111"){add_cycle(1,6,2, face1, face2, layer); add_cycle(4,7,3, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);} 
-    else if (pattern == "31330111"){add_cycle(1,6,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);} 
-    else if (pattern == "13330111"){add_cycle(2,6,3, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer); add_cycle(4,8,1, face1, face2, layer+5);} 
-
-    // the "four-same-number" cases:
-
-    else if (pattern == "22220001"){add_cycle(1,8,2, face1, face2, layer);}
-    else if (pattern == "22220010"){add_cycle(1,7,2, face1, face2, layer);}  
-    else if (pattern == "22220100"){add_cycle(1,6,2, face1, face2, layer);} 
-    else if (pattern == "22221000"){add_cycle(1,5,2, face1, face2, layer);}
-    
-    else if (pattern == "33331001"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "33331010"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "33331100"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    
-    else if (pattern == "33330110"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer);}
-    else if (pattern == "33330101"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-    else if (pattern == "33330011"){add_cycle(1,7,2, face1, face2, layer); add_cycle(3,8,4, face1, face2, layer);}
-
-    else if (pattern == "44441110"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5);}
-    else if (pattern == "44441101"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "44441011"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-    else if (pattern == "44440111"){add_cycle(1,6,2, face1, face2, layer); add_cycle(3,7,4, face1, face2, layer); add_cycle(1,8,2, face1, face2, layer+5);}
-
-
-    else if (pattern == "00012222"){add_cycle(4,5,1, face1, face2, layer);}
-    else if (pattern == "00102222"){add_cycle(3,5,1, face1, face2, layer);}  
-    else if (pattern == "01002222"){add_cycle(2,5,1, face1, face2, layer);} 
-    else if (pattern == "10002222"){add_cycle(1,5,2, face1, face2, layer);}
-    
-    else if (pattern == "10013333"){add_cycle(1,5,2, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "10103333"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "11003333"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer);}
-    
-    else if (pattern == "01103333"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer);}
-    else if (pattern == "01013333"){add_cycle(2,5,1, face1, face2, layer); add_cycle(4,6,3, face1, face2, layer);}
-    else if (pattern == "00113333"){add_cycle(3,5,1, face1, face2, layer); add_cycle(4,6,2, face1, face2, layer);}
-
-    else if (pattern == "11104444"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(2,7,1, face1, face2, layer+5);}
-    else if (pattern == "11014444"){add_cycle(1,5,3, face1, face2, layer); add_cycle(2,6,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "10114444"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-    else if (pattern == "01114444"){add_cycle(2,5,1, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(4,7,1, face1, face2, layer+5);}
-
-
-    
-
-    // 4-4 swap
-    else if (pattern == "11111111"){add_cycle(1,5,2, face1, face2, layer); add_cycle(3,6,4, face1, face2, layer); add_cycle(1,7,2, face1, face2, layer+5); add_cycle(3,8,4, face1, face2, layer+5);} 
-
-
-
-    else {
-        cout << "\nPattern not recognized: " << pattern << endl;
+// FOR READING:
+
+// A cycle is (a,b,c) with indices in 1..8
+struct CsvCycle { int a, b, c; };
+using CsvSequence = vector<CsvCycle>;
+
+// Storage for all patterns
+static unordered_map<string, vector<CsvSequence>> g_sequences_by_pattern;
+static unordered_map<string, int>                g_minlen_by_pattern;
+static bool g_table_loaded = false;
+
+// Trim helpers
+static inline void ltrim(string& s){ size_t p=0; while (p<s.size() && isspace((unsigned char)s[p])) ++p; s.erase(0,p); }
+static inline void rtrim(string& s){ size_t p=s.size(); while (p>0 && isspace((unsigned char)s[p-1])) --p; s.erase(p); }
+static inline string trim_copy(string s){ ltrim(s); rtrim(s); return s; }
+
+static vector<string> split_csv_4cols(const string& line) {
+    vector<string> cols;
+    cols.reserve(4);
+    bool in_quotes = false;
+    string cur;
+    for (size_t i=0;i<line.size();++i) {
+        char ch = line[i];
+        if (ch == '"') { in_quotes = !in_quotes; continue; }
+        if (ch == ',' && !in_quotes) {
+            cols.push_back(cur);
+            cur.clear();
+        } else {
+            cur.push_back(ch);
+        }
     }
-    
+    cols.push_back(cur);
+    while (cols.size() < 4) cols.push_back("");
+    return cols;
+}
 
+// Parse "(x,y,z)" triples from a chunk; returns one sequence.
+static CsvSequence parse_cycle_list(const string& chunkRaw) {
+    CsvSequence seq;
+    string s = chunkRaw;
+    // strip surrounding quotes just in case
+    if (!s.empty() && s.front()=='"' && s.back()=='"') s = s.substr(1, s.size()-2);
+
+    const char* p = s.c_str();
+    while (*p) {
+        // find '('
+        while (*p && *p!='(') ++p;
+        if (!*p) break;
+        ++p; // after '('
+        // skip spaces
+        while (*p==' '||*p=='\t') ++p;
+
+        char* endp=nullptr;
+        int a = strtol(p,&endp,10); p=endp;
+        while (*p==','||*p==' '||*p=='\t') ++p;
+        int b = strtol(p,&endp,10); p=endp;
+        while (*p==','||*p==' '||*p=='\t') ++p;
+        int c = strtol(p,&endp,10); p=endp;
+
+        // advance to ')'
+        while (*p && *p!=')') ++p;
+        if (*p==')') ++p;
+
+        if (a>=1 && a<=8 && b>=1 && b<=8 && c>=1 && c<=8)
+            seq.push_back({a,b,c});
+    }
+    return seq;
 }
+
+// Split the "sequences" cell by '|' to multiple sequences, trimming spaces.
+static vector<CsvSequence> parse_sequences_cell(const string& cellRaw) {
+    vector<CsvSequence> all;
+    size_t start = 0;
+    while (start < cellRaw.size()) {
+        size_t bar = cellRaw.find('|', start);
+        string chunk = (bar==string::npos) ? cellRaw.substr(start) : cellRaw.substr(start, bar-start);
+        chunk = trim_copy(chunk);
+        if (!chunk.empty()) {
+            auto seq = parse_cycle_list(chunk);
+            if (!seq.empty()) all.push_back(std::move(seq));
+        }
+        if (bar==string::npos) break;
+        start = bar + 1;
+    }
+    return all;
 }
+
+// Load once (lazily) from a file you can configure here:
+static const char* kPatternCSV = "cycle_tables.csv";
+
+static void load_pattern_table_once() {
+    if (g_table_loaded) return;
+    g_table_loaded = true;
+
+    ifstream in(kPatternCSV);
+    if (!in) {
+        cerr << "[mapping_into_3cycles] WARNING: cannot open " << kPatternCSV << "\n";
+        return;
+    }
+
+    string header; getline(in, header); // skip header
+    string line;
+    while (getline(in, line)) {
+        if (line.empty()) continue;
+        auto cols = split_csv_4cols(line);
+        string pattern = trim_copy(cols[0]);
+        // cols[1] (example_count) unused here
+        int min_len = 0;
+        try { min_len = stoi(trim_copy(cols[2])); } catch(...) { min_len = 0; }
+        string sequences_cell = cols[3];
+
+        auto seqs = parse_sequences_cell(sequences_cell);
+        if (!seqs.empty()) {
+            auto& dst = g_sequences_by_pattern[pattern];
+            dst.insert(dst.end(), seqs.begin(), seqs.end());
+            if (!g_minlen_by_pattern.count(pattern)) g_minlen_by_pattern[pattern] = min_len;
+            else g_minlen_by_pattern[pattern] = std::min(g_minlen_by_pattern[pattern], min_len);
+        } else {
+            // even if no sequences parsed, keep min_len if present
+            if (!g_minlen_by_pattern.count(pattern)) g_minlen_by_pattern[pattern] = min_len;
+        }
+    }
+}
+
+// Pick one sequence to apply for a pattern.
+// Current policy: prefer minimal length sequences; if multiple, take the first.
+static const CsvSequence* pick_sequence_for_pattern(const string& pattern) {
+    load_pattern_table_once();
+    auto it = g_sequences_by_pattern.find(pattern);
+    if (it == g_sequences_by_pattern.end() || it->second.empty()) return nullptr;
+
+    // Filter to minimal length (either from file's min_len or recompute)
+    int minL = INT_MAX;
+    auto itMin = g_minlen_by_pattern.find(pattern);
+    if (itMin != g_minlen_by_pattern.end() && itMin->second > 0) {
+        minL = itMin->second;
+    } else {
+        for (auto& s : it->second) minL = std::min<int>(minL, (int)s.size());
+        if (minL == INT_MAX) minL = 0;
+    }
+    for (auto& s : it->second) {
+        if ((int)s.size() == minL) return &s; // first minimal
+    }
+    return &it->second.front(); // fallback
+}
+
+// END FOR READING
+
+
+void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer) {
+    const CsvSequence* seq = pick_sequence_for_pattern(pattern);
+    if (!seq) {
+        // Nothing known for this pattern — do nothing (or log).
+        // cerr << "[mapping_into_3cycles] No sequence for pattern " << pattern << "\n";
+        return;
+    }
+    for (const auto& cyc : *seq) {
+        add_cycle(cyc.a, cyc.b, cyc.c, face1, face2, layer);
+    }
+}
+
+
 
 
 int mapPos(int pos1to8, int face1, int face2) { // Map a position 1..8 to an index in the 24-char state string,
