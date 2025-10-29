@@ -382,7 +382,7 @@ Defaults:
 
             // filter out the diag centers, edges and corners
             if (a == b || a == M || b == M) {
-                skipped++;
+                //skipped++;
                 continue;
             }
 
@@ -473,3 +473,4 @@ Defaults:
     std::cerr << "Done. Wrote " << out_path << "\n";
     return 0;
 }
+

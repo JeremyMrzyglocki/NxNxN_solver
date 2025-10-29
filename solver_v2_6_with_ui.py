@@ -5,7 +5,10 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (QApplication, QLineEdit, QPushButton, QTextEdit, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtCore import QTimer
 from vispy import scene, app as vispy_app
-from solver_v2_6 import SolverV2_5 as Solver
+from solver_v2_6 import SolverV2_6 as Solver
+import imageio.v3 as iio
+from PIL import Image  
+
 
 
 # ---- color dictionaries (same as your solver) ----
@@ -80,28 +83,27 @@ class SolverUI(QtWidgets.QMainWindow):
 
         self.showMaximized()
         
-        # ---------- frame capture / video rendering ----------
-    def render_images(self, video_length: float, fps: int, out_dir: str = "frames", make_video: bool = False, video_filename: str = "render.mp4"):
-        """
-        Call this BEFORE starting an animation run.
-        It sets up a capture plan for the next run using total move count to pace frame saves.
+    #     # ---------- frame capture / video rendering ----------
+    # def render_images(self, video_length: float, fps: int, out_dir: str = "frames", make_video: bool = False, video_filename: str = "render.mp4"):
+    #     """
+    #     Call this BEFORE starting an animation run.
+    #     It sets up a capture plan for the next run using total move count to pace frame saves.
 
-        Args:
-            video_length (float): desired video length in seconds
-            fps (int): target frames per second
-            out_dir (str): folder to save frames
-            make_video (bool): try to stitch frames into a video after the run
-            video_filename (str): output video file name (in out_dir)
-        """
-        from pathlib import Path
-        self._capture_params = dict(
-            video_length=float(video_length),
-            fps=int(fps),
-            out_dir=str(out_dir),
-            make_video=bool(make_video),
-            video_filename=str(video_filename),
-        )
-        self.output.append(f"🎥 Capture prepared: {video_length}s @ {fps}fps into '{out_dir}'.")
+    #     Args:
+    #         video_length (float): desired video length in seconds
+    #         fps (int): target frames per second
+    #         out_dir (str): folder to save frames
+    #         make_video (bool): try to stitch frames into a video after the run
+    #         video_filename (str): output video file name (in out_dir)
+    #     """
+    #     self._capture_params = dict(
+    #         video_length=float(video_length),
+    #         fps=int(fps),
+    #         out_dir=str(out_dir),
+    #         make_video=bool(make_video),
+    #         video_filename=str(video_filename),
+    #     )
+    #     self.output.append(f"🎥 Capture prepared: {video_length}s @ {fps}fps into '{out_dir}'.")
 
     def _init_capture_plan(self):
         """Compute capture thresholds (#moves) for the upcoming run, based on planned self._moves."""
@@ -130,7 +132,6 @@ class SolverUI(QtWidgets.QMainWindow):
         self._capture_enabled = True
 
         # prepare output directory
-        from pathlib import Path
         out_dir = Path(params["out_dir"])
         out_dir.mkdir(parents=True, exist_ok=True)
         self._capture_out_dir = out_dir
@@ -143,11 +144,9 @@ class SolverUI(QtWidgets.QMainWindow):
     def _save_current_frame(self, force_index: int = None):
         """Render current canvas state and write a PNG into out_dir."""
         try:
-            import imageio.v3 as iio
             _have_imageio = True
         except Exception:
             _have_imageio = False
-            from PIL import Image  # fallback
 
         # redraw to refresh the internal buffer
         self.update_image()
@@ -376,7 +375,8 @@ class SolverUI(QtWidgets.QMainWindow):
 
         t0 = time.time()
         try:
-            self.solver.run_pipeline(scramble=False, mode="sorting_network")   # do no scramble again
+            self.solver.run_pipeline(scramble=False, mode="sorting_network")  
+            #self.solver.run_pipeline(scramble=False, mode="row_wise")  
             self.output.append(f"✅ Done. Outputs in: {self.solver.run_dir}")
         except Exception as e:
             self.output.append(f"✖ solver failed: {e}")
@@ -531,7 +531,8 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=100, seed=123456, cell_size=1)
+    win = SolverUI(M=5, seed=0, cell_size=1)
+    
     #win.render_images(video_length=10, fps=30, out_dir="frames_M50", make_video=False)
     win.show()
 
