@@ -618,7 +618,8 @@ static void load_pattern_table_once() {
 
 // Pick one sequence to apply for a pattern.
 // Current policy: prefer minimal length sequences; if multiple, take the first.
-static const CsvSequence* pick_sequence_for_pattern(const string& pattern) {
+
+static const CsvSequence* pick_sequence_for_pattern(const string& pattern) { // option1
     load_pattern_table_once();
     auto it = g_sequences_by_pattern.find(pattern);
     if (it == g_sequences_by_pattern.end() || it->second.empty()) return nullptr;
@@ -637,6 +638,144 @@ static const CsvSequence* pick_sequence_for_pattern(const string& pattern) {
     }
     return &it->second.front(); // fallback
 }
+
+// Alternative: more complex selection strategy based on cycle frequencies.
+
+
+// static const CsvSequence* pick_sequence_for_pattern(const std::string& pattern) { // option2
+//     ++g_patterns_looked_this_run;
+//     load_pattern_table_once();
+
+//     auto it = g_sequences_by_pattern.find(pattern);
+//     if (it == g_sequences_by_pattern.end() || it->second.empty()) {
+//         ++g_patterns_missing_this_run;
+//         return nullptr;
+//     }
+
+//     // Compute min length as before
+//     int minL = INT_MAX;
+//     auto itMin = g_minlen_by_pattern.find(pattern);
+//     if (itMin != g_minlen_by_pattern.end() && itMin->second > 0) {
+//         minL = itMin->second;
+//     } else {
+//         for (auto& s : it->second) minL = std::min<int>(minL, (int)s.size());
+//         if (minL == INT_MAX) minL = 0;
+//     }
+
+//     // Helper: total frequency of a cycle across all layers
+//     auto cycle_freq = [](int a, int b, int c) -> long long {
+//         std::string key = "(" + std::to_string(a) + "," + std::to_string(b) + "," + std::to_string(c) + ")";
+//         long long tot = 0;
+//         for (int L = 1; L <= 10; ++L) {
+//             auto itLayer = G_cycle_hist_by_layer[L].find(key);
+//             if (itLayer != G_cycle_hist_by_layer[L].end()) tot += itLayer->second;
+//         }
+//         return tot;
+//     };
+
+//     // Score: sum of cycle frequencies (log1p to soften very large counts)
+//     auto score_seq = [&](const CsvSequence& seq) -> double {
+//         double s = 0.0;
+//         for (const auto& c : seq) {
+//             long long f = cycle_freq(c.a, c.b, c.c);
+//             s += std::log1p((double)f);
+//         }
+//         return s;
+//     };
+
+//     const CsvSequence* best = nullptr;
+//     double bestScore = -1e300;
+
+//     for (auto& s : it->second) {
+//         if ((int)s.size() != minL) continue;      // keep strict min-length
+//         double sc = score_seq(s);
+//         // tie-break: higher score, then lexicographically first (stable fallback)
+//         if (sc > bestScore) { bestScore = sc; best = &s; }
+//     }
+
+//     if (!best) best = &it->second.front();        // fallback
+
+//     ++g_patterns_used_this_run;
+//     ++G_pattern_hist[pattern];
+//     return best;
+// }
+
+
+// static const CsvSequence* pick_sequence_for_pattern(const std::string& pattern) { // option3
+//     ++g_patterns_looked_this_run;
+//     load_pattern_table_once();
+
+//     auto it = g_sequences_by_pattern.find(pattern);
+//     if (it == g_sequences_by_pattern.end() || it->second.empty()) {
+//         ++g_patterns_missing_this_run;
+//         return nullptr;
+//     }
+
+//     // As before, compute min length for reference
+//     int minL = INT_MAX;
+//     auto itMin = g_minlen_by_pattern.find(pattern);
+//     if (itMin != g_minlen_by_pattern.end() && itMin->second > 0) {
+//         minL = itMin->second;
+//     } else {
+//         for (auto& s : it->second) minL = std::min<int>(minL, (int)s.size());
+//         if (minL == INT_MAX) minL = 0;
+//     }
+
+//     // Pull total cycle frequency across layers
+//     auto cycle_freq = [](int a, int b, int c) -> long long {
+//         std::string key = "(" + std::to_string(a) + "," + std::to_string(b) + "," + std::to_string(c) + ")";
+//         long long tot = 0;
+//         for (int L = 1; L <= 10; ++L) {
+//             auto itLayer = G_cycle_hist_by_layer[L].find(key);
+//             if (itLayer != G_cycle_hist_by_layer[L].end()) tot += itLayer->second;
+//         }
+//         return tot;
+//     };
+
+//     // Scoring:
+//     //  - Base: sum(log1p(freq(cycle)))
+//     //  - Bigram bonus: sum over adjacent cycles of sqrt(freq_i * freq_j)
+//     //  - Length penalty: lambda * (len - minL)
+//     constexpr double LAMBDA_LEN = 0.15;  // adjust to taste
+//     constexpr double BIGRAM_W   = 0.15;  // weight of pair synergy
+
+//     auto score_seq = [&](const CsvSequence& seq) -> double {
+//         if (seq.empty()) return -1e300;
+//         std::vector<double> f; f.reserve(seq.size());
+//         for (const auto& c : seq) f.push_back(std::log1p((double)cycle_freq(c.a,c.b,c.c)));
+
+//         double s = 0.0;
+//         for (double x : f) s += x;
+
+//         // bigram synergy (alpha -> beta)
+//         for (size_t i = 1; i < f.size(); ++i) {
+//             // Use geometric mean of underlying (non-log) freqs as a proxy
+//             long long fi_raw = std::max(0LL, (long long)std::round(std::expm1(f[i-1])));
+//             long long fj_raw = std::max(0LL, (long long)std::round(std::expm1(f[i])));
+//             s += BIGRAM_W * std::sqrt((double)fi_raw * (double)fj_raw);
+//         }
+
+//         // penalize being longer than min
+//         s -= LAMBDA_LEN * std::max<int>(0, (int)seq.size() - minL);
+//         return s;
+//     };
+
+//     const CsvSequence* best = nullptr;
+//     double bestScore = -1e300;
+
+//     // Consider ALL candidate sequences (not only min length).
+//     for (auto& s : it->second) {
+//         double sc = score_seq(s);
+//         if (sc > bestScore) { bestScore = sc; best = &s; }
+//     }
+
+//     if (!best) best = &it->second.front(); // ultra-safe fallback
+
+//     ++g_patterns_used_this_run;
+//     ++G_pattern_hist[pattern];
+//     return best;
+// }
+
 
 // END FOR READING
 
