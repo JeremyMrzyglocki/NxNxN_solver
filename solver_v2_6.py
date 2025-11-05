@@ -352,61 +352,79 @@ class SolverV2_6:
         self.sw.stop("plan.total")
         
 
-    def run_sorting_network_2D_stage(self, *, sector_count: int = 1) -> None:
+    def run_orbit_point_generator(self, project_dir: Path | str, *, sector_count: int = 1) -> None:
         """
-        After cycles are generated (cycles_wave*.txt), do the 2D bucketing,
-        run the orbit_pipeline binary, and stitch a single solution.txt.
+        From cycles_wave*.txt under project_dir:
+        1) build orbit_points_wave_<w>/ folders
+        2) call orbit_points_to_2D_algs with --project/--waves/--N/--sectors/[--table]
         """
-        # 1) discover cycles_wave*.txt in run_dir, ordered by wave number
-        waves = []
-        for p in sorted(self.run_dir.glob("cycles_wave*.txt")):
+        project_dir = Path(project_dir)
+
+        # discover waves
+        wave_nums = []
+        for p in sorted(project_dir.glob("cycles_wave*.txt")):
             m = re.match(r"cycles_wave(\d+)\.txt$", p.name)
             if m:
-                waves.append((int(m.group(1)), p))
-
-        if not waves:
-            print("⚠️ No cycles_wave*.txt in run_dir")
+                wave_nums.append(int(m.group(1)))
+        if not wave_nums:
+            print(f"⚠️ No cycles_wave*.txt in {project_dir}")
             return
+        waves_count = max(wave_nums)
 
-        # Where the global (across all waves) solution will go
-        big_solution = self.run_dir / "solution.txt"
-        with big_solution.open("w", encoding="utf-8") as big_out:
+        # build orbit_points_wave_<w>/* from each cycles file
+        for w in sorted(wave_nums):
+            _ = extract_orbits_for_one_wave(
+                waves_dir=project_dir,
+                cycles_file=project_dir / f"cycles_wave{w}.txt",
+                M=self.M,
+                out_subdir_prefix="orbit_points",
+            )
 
-            for w, cycles_path in waves:
-                # 1) Make per-wave orbit_points_wave_<w> from this single cycles file
-                orbit_dir = extract_orbits_for_one_wave(
-                    waves_dir=self.run_dir,
-                    cycles_file=cycles_path,
-                    M=self.M,
-                    out_subdir_prefix="orbit_points",
-                )  # -> <run_dir>/orbit_points_wave_<w>
+        # choose table: prefer project-local copy
+        project_table = project_dir / "table_with_formula_v2.txt"
+        fallback_table = self.project_root / "table_with_formula_v2.txt"
+        table_path = project_table if project_table.exists() else fallback_table
 
-                # 2) Build per-wave output dirs
-                inter_dir = self.run_dir / f"intermediary_wave_{w}"
-                sol_dir   = self.run_dir / f"solutions_wave_{w}"
-                inter_dir.mkdir(parents=True, exist_ok=True)
-                sol_dir.mkdir(parents=True, exist_ok=True)
+        # call the new C++ generator
+        exe = str(self.project_root / "orbit_points_to_2D_algs")
+        cmd = [
+            exe,
+            "--project", str(project_dir),
+            "--waves", str(waves_count),
+            "--N", str(self.M),
+            "--sectors", str(sector_count),
+            "--table", str(table_path),
+        ]
+        print("Running orbit_points_to_2D_algs:", " ".join(map(str, cmd)))
+        subprocess.run(cmd, check=True)
+        print("✅ orbit_points_to_2D_algs finished.")
 
-                # 3) Run single-wave orbit_pipeline (NEW C++ expects one dir OR one file)
-                exe         = str(self.project_root / "orbit_pipeline")
-                table_path  = str(self.project_root / "table_with_formula_v2.txt")
-                #sector_count = 1  # keep as 1 (or your own setting)
-                cmd = [exe, str(orbit_dir), str(self.M), str(sector_count), str(inter_dir), table_path, str(sol_dir)]
 
-                print("Running wave", w, ":", " ".join(cmd))
-                subprocess.run(cmd, check=True)
+    def run_rearrange_2D(self, project_dir: Path | str, *, sector_count: int = 1) -> str:
+        """
+        Generate per-wave sol files + combined 2D solution inside project_dir.
+        Returns path to project_dir/solution.txt
+        """
+        project_dir = Path(project_dir)
 
-                print("Solution files written to:", sol_dir)
+        # run generator (handles all waves and writes solution_2D_parallelization.txt)
+        self.run_orbit_point_generator(project_dir, sector_count=sector_count)
 
-                # 4) Append per-wave solution (solutions_wave_<w>/solution.txt) to the big file
-                per_wave_solution = sol_dir / "solution.txt"
-                if per_wave_solution.exists():
-                    big_out.write(f"# --- wave {w} ---\n")
-                    with per_wave_solution.open("r", encoding="utf-8", errors="ignore") as f:
-                        for line in f:
-                            line = line.strip()
-                            if line:
-                                big_out.write(line + "\n")
+        combined = project_dir / "solution_2D_parallelization.txt"
+        final_out = project_dir / "solution.txt"
+
+        if combined.exists():
+            with combined.open("r", encoding="utf-8", errors="ignore") as src, \
+                final_out.open("w", encoding="utf-8") as dst:
+                for line in src:
+                    if line.strip():
+                        dst.write(line if line.endswith("\n") else (line + "\n"))
+            print(f"🧩 Final solution written: {final_out}")
+            return str(final_out)
+
+        # fallback: stitch whatever *.txt are present if the combined file is missing
+        out_path = write_big_solution_file(sol_dir=str(project_dir), run_dir=str(project_dir), out_name="solution.txt")
+        return out_path or str(final_out)
 
 
     def run_rearrange_and_count(self):
@@ -472,10 +490,9 @@ class SolverV2_6:
                 f"  wave_{w}_parallel.txt: {per_wave_counts[w]} moves "
                 f"(expand {t['expand_sec']:.3f}s, count {t['count_sec']:.3f}s, total {t['total_sec']:.3f}s)"
             )
-            
             return total, per_wave_counts, per_wave_times       
 
-    def run_pipeline(self, *, scramble: bool = False, mode: str, sector_count: int = 1):
+    def run_pipeline(self, *, scramble: bool = False, mode: str, sector_count: int):
         t_pipeline0 = perf_counter()
         if scramble:
             self.scramble_all_orbits()
@@ -487,11 +504,13 @@ class SolverV2_6:
         save_orbits_to_txt(self.subcell_color, self.M, str(self.run_dir / "cube_state.txt"))
         self.sw.stop("save_state")
 
-        self.produce_full_plan(mode=mode) # 1) generate
-        self.run_rearrange_and_count() # 2) expand/count (same for all modes that produce cycles_wave*.txt)
+        self.produce_full_plan(mode=mode)
+        if mode in ("row_wise", "sorting_network"):
+            self.run_rearrange_and_count() 
 
-        if mode == "sorting_network_2D":  
-            self.run_sorting_network_2D_stage(sector_count=sector_count)
+        if mode == "sorting_network_2D":
+            self.run_rearrange_2D(self.run_dir, sector_count=sector_count)
+            # I need to change the name of rearrange to "make_algorithms_1D / make_algorithms_2D" or something
 
         total_time = perf_counter() - t_pipeline0
         print(f"\n✅ solver_v2_6 finished in {total_time:.2f}s")
@@ -628,6 +647,7 @@ def write_big_solution_file(sol_dir: str, run_dir: str, out_name: str = "solutio
                     for line in f:
                         line = line.strip()
                         if line:
+                            
                             out.write(line + "\n")
             except OSError:
                 continue

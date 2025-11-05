@@ -266,7 +266,7 @@ class SolverUI(QtWidgets.QMainWindow):
             self.solver.baseline_subcell_color = self.baseline_subcell_color.copy()
         t0 = time.time()
         try:
-            self.solver.run_pipeline(scramble=False, mode="sorting_network")  
+            self.solver.run_pipeline(scramble=False, mode="sorting_network", sector_count=1)  
             self.output.append(f"✅ Done. Outputs in: {self.solver.run_dir}")
         except Exception as e:
             self.output.append(f"✖ solver failed: {e}")
@@ -424,7 +424,7 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=10, seed=99, cell_size=1)
+    win = SolverUI(M=10, seed=101, cell_size=1)
     win.show()
     sys.exit(qapp.exec_())
 
