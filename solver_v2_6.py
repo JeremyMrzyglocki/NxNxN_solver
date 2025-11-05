@@ -8,11 +8,10 @@ import itertools
 from time import perf_counter
 import os
 from typing import Tuple
-import subprocess, shutil
+import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 from typing import Dict, List, Tuple
-
 
 # ---------- paths / constants ----------
 RUNS_ROOT = Path("runs")
@@ -22,7 +21,6 @@ RUN_DIR.mkdir(parents=True, exist_ok=True)
 COLOR_ID = {'W': 0, 'O': 1, 'G': 2, 'R': 3, 'B': 4, 'Y': 5}
 ID_COLOR = ['W', 'O', 'G', 'R', 'B', 'Y']
 CHUNKSIZE = 1024
-
 
 # ---------- packed color field ----------
 class ColorField:
@@ -230,6 +228,41 @@ def _compute_orbit_swap(args):
         waves[w].append(f"orbit({a},{b}) - rot({i+1},{j+1},{k+1})") # I prefer 1-based-indexing for the rotations
     return dict(waves)
 
+def extract_orbits_for_one_wave(
+    waves_dir: Path,
+    cycles_file: Path,
+    M: int,
+    out_subdir_prefix: str = "orbit_points",
+) -> Path:
+    """
+    Parse a single cycles_wave<k>.txt and write bucketed orbit files to
+      <waves_dir>/<out_subdir_prefix>_wave_<k>/*.txt
+    Returns the created output directory path.
+    """
+    # Expect filename like cycles_wave3.txt
+    m = re.match(r"cycles_wave(\d+)\.txt$", cycles_file.name)
+    if not m:
+        raise ValueError(f"Not a cycles_wave file: {cycles_file}")
+
+    w = int(m.group(1))
+    out_dir = waves_dir / f"{out_subdir_prefix}_wave_{w}"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Uses your existing helper to parse & bucket a single cycles file
+    local = _bucket_file(str(cycles_file), M)  # {(a,b,c): [(x,y), ...]}
+
+    written = 0
+    for (a, b, c), pairs in sorted(local.items()):
+        pairs.sort()
+        out_path = out_dir / f"{a}_{b}_{c}.txt"
+        with out_path.open("w", encoding="utf-8") as out:
+            for x, y in pairs:
+                out.write(f"{x},{y}\n")
+        written += 1
+
+    print(f"✅ Wave {w}: wrote {written} orbit files to: {out_dir}")
+    return out_dir
+
 class SolverV2_6:
     def __init__(self, M=16, seed: Optional[int] = None):
         self.M = M
@@ -263,7 +296,7 @@ class SolverV2_6:
         self.sw.stop("scramble")
 
 
-    def produce_full_plan(self, *, mode: str = "sorting_network"):
+    def produce_full_plan(self, *, mode: str = "row_wise") -> None:
         self.sw.start("plan.total")
         
         if mode == "row_wise":
@@ -316,38 +349,64 @@ class SolverV2_6:
             self.sw.add("plan.compute", t1 - t0)
         else:
             raise ValueError(f"Unknown mode: {mode}")
-
         self.sw.stop("plan.total")
         
-    def run_sorting_network_2D_stage(self, *, sector_count: int = 5) -> None:
+
+    def run_sorting_network_2D_stage(self, *, sector_count: int = 1) -> None:
         """
         After cycles are generated (cycles_wave*.txt), do the 2D bucketing,
         run the orbit_pipeline binary, and stitch a single solution.txt.
         """
-        # 1) group 3-cycles into orbit_points/*.txt
-        extract_orbits_for_all_cycles(waves_dir=str(self.run_dir))
+        # 1) discover cycles_wave*.txt in run_dir, ordered by wave number
+        waves = []
+        for p in sorted(self.run_dir.glob("cycles_wave*.txt")):
+            m = re.match(r"cycles_wave(\d+)\.txt$", p.name)
+            if m:
+                waves.append((int(m.group(1)), p))
 
-        # 2) paths
-        run_dir   = self.run_dir
-        orbit_dir = os.path.join(run_dir, "orbit_points")
-        inter_dir = os.path.join(run_dir, "intermediary")
-        sol_dir   = os.path.join(run_dir, "solutions")
-        os.makedirs(inter_dir, exist_ok=True)
-        os.makedirs(sol_dir, exist_ok=True)
+        if not waves:
+            print("⚠️ No cycles_wave*.txt in run_dir")
+            return
 
-        table_path = os.path.join(self.project_root, "table_with_formula_v2.txt")
-        exe        = os.path.join(self.project_root, "orbit_pipeline")
+        # Where the global (across all waves) solution will go
+        big_solution = self.run_dir / "solution.txt"
+        with big_solution.open("w", encoding="utf-8") as big_out:
 
-        # 3) run orbit_pipeline
-        cmd = [exe, orbit_dir, str(self.M), str(sector_count), inter_dir, table_path, sol_dir]
-        print("Running:", " ".join(cmd))
-        subprocess.run(cmd, check=True)
-        print("Solution files written to:", sol_dir)
+            for w, cycles_path in waves:
+                # 1) Make per-wave orbit_points_wave_<w> from this single cycles file
+                orbit_dir = extract_orbits_for_one_wave(
+                    waves_dir=self.run_dir,
+                    cycles_file=cycles_path,
+                    M=self.M,
+                    out_subdir_prefix="orbit_points",
+                )  # -> <run_dir>/orbit_points_wave_<w>
 
-        # 4) unify into a single run_dir/solution.txt
-        write_big_solution_file(sol_dir=sol_dir, run_dir=str(run_dir), out_name="solution.txt")
+                # 2) Build per-wave output dirs
+                inter_dir = self.run_dir / f"intermediary_wave_{w}"
+                sol_dir   = self.run_dir / f"solutions_wave_{w}"
+                inter_dir.mkdir(parents=True, exist_ok=True)
+                sol_dir.mkdir(parents=True, exist_ok=True)
 
+                # 3) Run single-wave orbit_pipeline (NEW C++ expects one dir OR one file)
+                exe         = str(self.project_root / "orbit_pipeline")
+                table_path  = str(self.project_root / "table_with_formula_v2.txt")
+                #sector_count = 1  # keep as 1 (or your own setting)
+                cmd = [exe, str(orbit_dir), str(self.M), str(sector_count), str(inter_dir), table_path, str(sol_dir)]
 
+                print("Running wave", w, ":", " ".join(cmd))
+                subprocess.run(cmd, check=True)
+
+                print("Solution files written to:", sol_dir)
+
+                # 4) Append per-wave solution (solutions_wave_<w>/solution.txt) to the big file
+                per_wave_solution = sol_dir / "solution.txt"
+                if per_wave_solution.exists():
+                    big_out.write(f"# --- wave {w} ---\n")
+                    with per_wave_solution.open("r", encoding="utf-8", errors="ignore") as f:
+                        for line in f:
+                            line = line.strip()
+                            if line:
+                                big_out.write(line + "\n")
 
 
     def run_rearrange_and_count(self):
@@ -355,7 +414,6 @@ class SolverV2_6:
         self.sw.start("expand_count.total")
         table = str(self.project_root / "table_with_formula_v2.txt")
         exe   = str(self.project_root / "rearrange")
-        Mval  = str(self.M)
 
         waves = []
         for p in sorted(self.run_dir.glob("cycles_wave*.txt")):
@@ -366,7 +424,7 @@ class SolverV2_6:
         per_wave_counts = {}
         for w, in_path in waves:
             out_path = self.run_dir / f"wave_{w}_parallel.txt"
-            cmd = [exe, "--cycles", str(in_path), "--table", table, "--out", str(out_path), "--M", Mval]
+            cmd = [exe, "--cycles", str(in_path), "--table", table, "--out", str(out_path), "--M", str(self.M)]
 
             t0 = perf_counter()
             proc = __import__("subprocess").run(cmd, capture_output=True, text=True)
@@ -415,24 +473,9 @@ class SolverV2_6:
                 f"(expand {t['expand_sec']:.3f}s, count {t['count_sec']:.3f}s, total {t['total_sec']:.3f}s)"
             )
             
-            
-                
-        # print(f"\nTOTAL MOVES: {total}")
-        # print("\n— Per-wave move counts & times —")
-        # for w in sorted(per_wave_times):
-        #     t = per_wave_times[w]
-        #     print(
-        #         f"  wave_{w}_parallel.txt: {per_wave_counts[w]} moves "
-        #         f"(expand {t['expand_sec']:.3f}s, count {t['count_sec']:.3f}s, total {t['total_sec']:.3f}s)"
-        #     )
-        # # ➜ add this return so the caller can log totals
-        # return total, per_wave_counts, per_wave_times
+            return total, per_wave_counts, per_wave_times       
 
-            
-            
-        
-
-    def run_pipeline(self, *, scramble: bool = False, mode: str, sector_count: int = 5):
+    def run_pipeline(self, *, scramble: bool = False, mode: str, sector_count: int = 1):
         t_pipeline0 = perf_counter()
         if scramble:
             self.scramble_all_orbits()
@@ -444,14 +487,10 @@ class SolverV2_6:
         save_orbits_to_txt(self.subcell_color, self.M, str(self.run_dir / "cube_state.txt"))
         self.sw.stop("save_state")
 
-        # 1) generate
-        self.produce_full_plan(mode=mode)
+        self.produce_full_plan(mode=mode) # 1) generate
+        self.run_rearrange_and_count() # 2) expand/count (same for all modes that produce cycles_wave*.txt)
 
-        # 2) expand/count (same for all modes that produce cycles_wave*.txt)
-        self.run_rearrange_and_count()
-
-        # 3) optional 2D stage (only for the new mode)
-        if mode == "sorting_network_2D":
+        if mode == "sorting_network_2D":  
             self.run_sorting_network_2D_stage(sector_count=sector_count)
 
         total_time = perf_counter() - t_pipeline0
@@ -467,69 +506,6 @@ class SolverV2_6:
         print(f"  expand_count.total  : {self.sw.get('expand_count.total'):.3f}")
         print(f"  pipeline.total      : {total_time:.3f}")
 
-    
-    
-    # def run_pipeline(self, *, scramble: bool = False, mode: str):
-    #     t_pipeline0 = perf_counter()
-    #     if scramble:
-    #         self.scramble_all_orbits()
-    #         self.baseline_subcell_color = self.subcell_color.copy()
-    #     if self.baseline_subcell_color is None:
-    #         self.baseline_subcell_color = self.subcell_color.copy()
-
-    #     self.sw.start("save_state")
-    #     save_orbits_to_txt(self.subcell_color, self.M, str(self.run_dir / "cube_state.txt"))
-    #     self.sw.stop("save_state")
-
-    #     self.produce_full_plan(mode=mode)
-
-    #     # ⬇️ capture totals from rearrange step
-    #     total_moves, per_wave_counts, per_wave_times = self.run_rearrange_and_count()
-
-    #     total_time = perf_counter() - t_pipeline0
-    #     print(f"\n✅ solver_v2_6 finished in {total_time:.2f}s")
-    #     print(f"Outputs in: {self.run_dir}")
-
-    #     print("\n— Timing summary (seconds) —")
-    #     print(f"  scramble            : {self.sw.get('scramble'):.3f}")
-    #     print(f"  save_state          : {self.sw.get('save_state'):.3f}")
-    #     print(f"  plan.total          : {self.sw.get('plan.total'):.3f}")
-    #     print(f"    plan.compute      : {self.sw.get('plan.compute'):.3f}")
-    #     print(f"    plan.write        : {self.sw.get('plan.write'):.3f}")
-    #     print(f"  expand_count.total  : {self.sw.get('expand_count.total'):.3f}")
-    #     print(f"  pipeline.total      : {total_time:.3f}")
-
-    #     # ➜ return benchmark-friendly summary
-    #     return {
-    #         "M": self.M,
-    #         "moves": int(total_moves),
-    #         "time_sec": float(total_time),
-    #         "run_dir": str(self.run_dir),
-    #     }
-
-
-def benchmark_sweep():
-    #Ms = [10, 20, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000]
-    Ms = [700, 800, 900, 1000, 2000, 3000]
-
-    log_path = RUN_DIR / "log.txt"
-    with log_path.open("w", encoding="utf-8") as log:
-        log.write("M,moves,time_sec,run_dir\n")
-        for M in Ms:
-            print(f"\n=== Benchmark M={M} ===")
-            solver = SolverV2_6(M=M)
-            # put each run in its own folder under the same timestamp root
-            perM_dir = RUN_DIR / f"M_{M}"
-            perM_dir.mkdir(parents=True, exist_ok=True)
-            solver.run_dir = perM_dir
-
-            # choose the mode you actually use; 'row_wise' is typical for generating cycles
-            summary = solver.run_pipeline(scramble=True, mode="sorting_network")
-            log.write(f"{summary['M']},{summary['moves']},{summary['time_sec']:.6f},{summary['run_dir']}\n")
-            log.flush()
-    print(f"\n📄 Benchmark log written to: {log_path}")
-
-
 # ---------- timing helper ----------
 class Stopwatch:
     def __init__(self): self.t = {}
@@ -538,7 +514,6 @@ class Stopwatch:
     def add(self, k, dt): self.t[k] = self.t.get(k, 0.0) + dt
     def get(self, k): return self.t.get(k, 0.0)
     
-
 
 def _parse_cycle_line_fast(line: str) -> Tuple[int,int,int,int,int] | None:
     """
@@ -565,11 +540,11 @@ def _parse_cycle_line_fast(line: str) -> Tuple[int,int,int,int,int] | None:
     except Exception:
         return None
 
-
-def _bucket_file(path: str) -> Dict[Tuple[int,int,int], List[Tuple[int,int]]]:
+def _bucket_file(path: str, M: int) -> Dict[Tuple[int,int,int], List[Tuple[int,int]]]:
     """
     Parse a single cycles_wave*.txt file and return a local bucket:
       {(x,y,z): [(o1,o2), ...], ...}
+    Skip orbit pairs where a==M, b==M , or a==b.
     """
     local = defaultdict(list)
     try:
@@ -579,45 +554,18 @@ def _bucket_file(path: str) -> Dict[Tuple[int,int,int], List[Tuple[int,int]]]:
                 if not parsed:
                     continue
                 o1, o2, x, y, z = parsed
+                # Skip unwanted datapoints
+                if o1 == M or o2 == M or o1 == o2:
+                    continue
                 local[(x, y, z)].append((o1, o2))
     except OSError:
         pass
     return local
 
-def _parse_cycle_line_fast(line: str) -> Tuple[int,int,int,int,int] | None:
-    if "orbit(" not in line or ") - rot(" not in line:
-        return None
-    try:
-        i1 = line.index("orbit(") + 6
-        i2 = line.index(")", i1)
-        o1_s, o2_s = line[i1:i2].split(",", 1)
-
-        j1 = line.index("rot(", i2) + 4
-        j2 = line.index(")", j1)
-        x_s, y_s, z_s = line[j1:j2].split(",", 2)
-
-        return (int(o1_s), int(o2_s), int(x_s), int(y_s), int(z_s))
-    except Exception:
-        return None
-
-def _bucket_file(path: str) -> Dict[Tuple[int,int,int], List[Tuple[int,int]]]:
-    local = defaultdict(list)
-    try:
-        with open(path, "r", encoding="utf-8", errors="ignore") as f:
-            for line in f:
-                parsed = _parse_cycle_line_fast(line)
-                if parsed:
-                    o1, o2, x, y, z = parsed
-                    local[(x, y, z)].append((o1, o2))
-    except OSError:
-        pass
-    return local
-
-def extract_orbits_for_all_cycles(
-    waves_dir: str,
-    out_subdir: str = "orbit_points",
-    max_workers: int | None = None
+def extract_orbits_for_all_cycles(waves_dir: str, M: int, out_subdir: str = "orbit_points",
+max_workers: int | None = None
 ) -> list[str]:
+    
     try:
         names = sorted(
             fn for fn in os.listdir(waves_dir)
@@ -635,7 +583,7 @@ def extract_orbits_for_all_cycles(
     global_bucket: Dict[Tuple[int,int,int], List[Tuple[int,int]]] = defaultdict(list)
 
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        futures = {pool.submit(_bucket_file, p): p for p in paths}
+        futures = {pool.submit(_bucket_file, p, M): p for p in paths}
         for fut in as_completed(futures):
             local = fut.result()
             for key, pairs in local.items():
@@ -655,7 +603,8 @@ def extract_orbits_for_all_cycles(
         written.append(out_path)
 
     print(f"✅ Bucketed {sum(len(v) for v in global_bucket.values())} orbit pairs "
-          f"across {len(global_bucket)} unique 3-cycles from {len(paths)} files.")
+          f"across {len(global_bucket)} unique 3-cycles from {len(paths)} files "
+          f"(excluding a==M, b==M, or a==b).")
     print(f"✅ Wrote {len(written)} files to: {out_dir}")
     return written
 
@@ -689,12 +638,4 @@ def write_big_solution_file(sol_dir: str, run_dir: str, out_name: str = "solutio
 if __name__ == "__main__":
     M = 10
     solver = SolverV2_6(M=M)
-    # Choose one of: "row_wise", "sorting_network", "sorting_network_2D"
-    solver.run_pipeline(scramble=True, mode="row_wise")
-                        #, sector_count=5)
-
-
-
-
-# if __name__ == "__main__":
-#     benchmark_sweep()
+    solver.run_pipeline(scramble=True, mode="sorting_network", sector_count=1)
