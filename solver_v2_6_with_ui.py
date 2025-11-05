@@ -7,16 +7,12 @@ from PyQt5.QtCore import QTimer
 from vispy import scene, app as vispy_app
 from solver_v2_6 import SolverV2_6 as Solver
 import imageio.v3 as iio
-from PIL import Image  
-
-
 
 # ---- color dictionaries (same as your solver) ----
 COLOR_ID = {'W': 0, 'O': 1, 'G': 2, 'R': 3, 'B': 4, 'Y': 5}
 ID_COLOR = ['W', 'O', 'G', 'R', 'B', 'Y']
 CUBE_RGB = {'W': (255,255,255), 'O': (255,165,0), 'G': (0,128,0), 'R': (255,0,0), 'B': (0,0,255), 'Y': (255,255,0)}
 
-# ---- same cube-net layout mapping as v2_4 ----
 def create_state_matrix(M):
     region_size = 2 * M
     rows, cols = 3 * region_size, 4 * region_size
@@ -82,112 +78,7 @@ class SolverUI(QtWidgets.QMainWindow):
         self._timer.timeout.connect(self._apply_next_chunk)
 
         self.showMaximized()
-        
-    #     # ---------- frame capture / video rendering ----------
-    # def render_images(self, video_length: float, fps: int, out_dir: str = "frames", make_video: bool = False, video_filename: str = "render.mp4"):
-    #     """
-    #     Call this BEFORE starting an animation run.
-    #     It sets up a capture plan for the next run using total move count to pace frame saves.
 
-    #     Args:
-    #         video_length (float): desired video length in seconds
-    #         fps (int): target frames per second
-    #         out_dir (str): folder to save frames
-    #         make_video (bool): try to stitch frames into a video after the run
-    #         video_filename (str): output video file name (in out_dir)
-    #     """
-    #     self._capture_params = dict(
-    #         video_length=float(video_length),
-    #         fps=int(fps),
-    #         out_dir=str(out_dir),
-    #         make_video=bool(make_video),
-    #         video_filename=str(video_filename),
-    #     )
-    #     self.output.append(f"🎥 Capture prepared: {video_length}s @ {fps}fps into '{out_dir}'.")
-
-    def _init_capture_plan(self):
-        """Compute capture thresholds (#moves) for the upcoming run, based on planned self._moves."""
-        params = getattr(self, "_capture_params", None)
-        if not params:
-            self._capture_enabled = False
-            return
-
-        total_moves = sum(cnt for _, _, cnt, _ in self._moves) if self._moves else 0
-        total_frames = max(1, int(params["video_length"] * params["fps"]))
-
-        if total_moves <= 0:
-            self.output.append("⚠️ No moves to capture; capture disabled.")
-            self._capture_enabled = False
-            return
-
-        # build thresholds at which to capture (in terms of # atomic moves applied)
-        thresholds = [round(i * total_moves / total_frames) for i in range(total_frames)]
-        thresholds = sorted(set(min(max(0, t), total_moves) for t in thresholds))
-        if thresholds[-1] != total_moves:
-            thresholds.append(total_moves)
-
-        self._capture_thresholds = thresholds
-        self._capture_next_idx = 0
-        self._moves_applied = 0
-        self._capture_enabled = True
-
-        # prepare output directory
-        out_dir = Path(params["out_dir"])
-        out_dir.mkdir(parents=True, exist_ok=True)
-        self._capture_out_dir = out_dir
-        self._capture_frame_paths = []
-
-        # if first threshold is 0, immediately save the initial state
-        if self._capture_thresholds and self._capture_thresholds[0] == 0:
-            self._save_current_frame(force_index=0)
-
-    def _save_current_frame(self, force_index: int = None):
-        """Render current canvas state and write a PNG into out_dir."""
-        try:
-            _have_imageio = True
-        except Exception:
-            _have_imageio = False
-
-        # redraw to refresh the internal buffer
-        self.update_image()
-        frame = getattr(self, "_last_frame", None)
-        if frame is None:
-            return
-
-        idx = force_index if force_index is not None else self._capture_next_idx
-        filename = f"frame_{idx:05d}.png"
-        p = (self._capture_out_dir / filename)
-        if _have_imageio:
-            iio.imwrite(p.as_posix(), frame)
-        else:
-            Image.fromarray(frame).save(p.as_posix())
-
-        self._capture_frame_paths.append(p.as_posix())
-
-    def _finalize_video_if_requested(self):
-        """If make_video=True, try to stitch frames into render.mp4 using imageio (pyav backend)."""
-        params = getattr(self, "_capture_params", None)
-        if not (params and params.get("make_video")):
-            return
-
-        try:
-            import imageio.v3 as iio
-        except Exception as e:
-            self.output.append(f"ℹ️ Skipping video assembly (imageio v3 not available): {e}")
-            return
-
-        fps = int(params["fps"])
-        out_path = (self._capture_out_dir / params["video_filename"]).as_posix()
-
-        try:
-            # Requires imageio v3 + pyav (ffmpeg/libx264 available)
-            with iio.imopen(out_path, "w", plugin="pyav") as f:
-                f.init_video_stream(fps=fps, codec="libx264")
-                for fp in self._capture_frame_paths:
-                    f.write_frame(iio.imread(fp))
-            self.output.append(f"✅ Video written: {out_path}")
-        except Exception as e:
-            self.output.append(f"ℹ️ Could not assemble video automatically: {e}")
 
     # ---------- UI scaffold ----------
     def _build_ui(self):
@@ -222,10 +113,14 @@ class SolverUI(QtWidgets.QMainWindow):
         self.scramble_btn.clicked.connect(self.on_scramble)
         row2.addWidget(self.scramble_btn)
 
-
         self.play_parallel_btn = QPushButton("[3.] Play solution in UI (recommended only for M <= 30)")
         self.play_parallel_btn.setToolTip("Play wave_*_parallel.txt from latest run_dir")
         self.play_parallel_btn.clicked.connect(self.play_parallel_solution)
+        row2.addWidget(self.play_parallel_btn)
+        
+        self.play_parallel_btn = QPushButton("[3b.] Play 2D-parallel solution in UI (recommended only for M <= 30)")
+        self.play_parallel_btn.setToolTip("Play wave_*_parallel.txt from latest run_dir")
+        self.play_parallel_btn.clicked.connect(self.play_2D_parallel_solution)
         row2.addWidget(self.play_parallel_btn)
 
         row2.addStretch(1)
@@ -279,7 +174,6 @@ class SolverUI(QtWidgets.QMainWindow):
 
         # flip (as before)
         buf = buf[:, ::-1, :]
-
         # store the final (displayed) frame for saving
         self._last_frame = buf
 
@@ -344,7 +238,6 @@ class SolverUI(QtWidgets.QMainWindow):
         if self.baseline_subcell_color is None:
             # if not scrambled yet, baseline is the current
             self.baseline_subcell_color = self.solver.subcell_color.copy()
-
         self.solver.subcell_color = self.baseline_subcell_color.copy()
 
         for face, p, cnt, spec in moves:
@@ -353,7 +246,6 @@ class SolverUI(QtWidgets.QMainWindow):
                 fn(p)
                 if spec:
                     self._rotate_surface(face, 1)
-
         self.update_image()
 
     # ---------- scramble / reset ----------
@@ -372,18 +264,15 @@ class SolverUI(QtWidgets.QMainWindow):
         if self.baseline_subcell_color is not None:
             self.solver.subcell_color = self.baseline_subcell_color.copy()
             self.solver.baseline_subcell_color = self.baseline_subcell_color.copy()
-
         t0 = time.time()
         try:
             self.solver.run_pipeline(scramble=False, mode="sorting_network")  
-            #self.solver.run_pipeline(scramble=False, mode="row_wise")  
             self.output.append(f"✅ Done. Outputs in: {self.solver.run_dir}")
         except Exception as e:
             self.output.append(f"✖ solver failed: {e}")
         finally:
             self.output.append(f"Elapsed: {time.time() - t0:.2f}s")
-
-
+            
     # ---------- solution playback ----------
     def play_parallel_solution(self):
         """Load wave_*_parallel.txt from current run_dir and animate."""
@@ -397,6 +286,14 @@ class SolverUI(QtWidgets.QMainWindow):
             self.output.append("No wave_*_parallel.txt files in run_dir.")
             return
         self._start_animation_from_files(wave_files)
+        
+    def play_2D_parallel_solution(self):  # play solution.txt:
+        run_dir = Path(self.solver.run_dir)
+        solution_file = run_dir / "solution.txt"
+        if not solution_file.exists():
+            self.output.append("No solution.txt file in run_dir.")
+            return
+        self._start_animation_from_files([solution_file])
 
     def _start_animation_from_files(self, files):
         try:
@@ -423,7 +320,6 @@ class SolverUI(QtWidgets.QMainWindow):
         self.solver.subcell_color = self.baseline_subcell_color.copy()
 
         self._moves = moves
-        self._init_capture_plan()
         self._move_idx = 0
         self._anim_running = True
         self._animation_start = time.time()
@@ -445,7 +341,6 @@ class SolverUI(QtWidgets.QMainWindow):
             self.output.append(f"✅ Applied {len(self._moves)} moves in {total:.2f}s")
             # finalize capture
             if getattr(self, '_capture_enabled', False):
-                self._finalize_video_if_requested()
                 self._capture_enabled = False
             return
 
@@ -475,8 +370,6 @@ class SolverUI(QtWidgets.QMainWindow):
             f"{self._move_idx}/{len(self._moves)} moves "
             f"({100*self._move_idx/len(self._moves):.1f}%)"
         )
-
-
 
     # ---------- per-face surface rotate (outer face when spec=True) ----------
     def _rotate_surface(self, face, count):
@@ -531,14 +424,9 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=5, seed=0, cell_size=1)
-    
-    #win.render_images(video_length=10, fps=30, out_dir="frames_M50", make_video=False)
+    win = SolverUI(M=10, seed=99, cell_size=1)
     win.show()
-
     sys.exit(qapp.exec_())
 
 if __name__ == "__main__":
     main()
-
-# ffmpeg -r 30 -i frames/frame_%05d.png -c:v libx264 -pix_fmt yuv420p frames/render.mp4
