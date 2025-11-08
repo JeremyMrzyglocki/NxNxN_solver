@@ -2,7 +2,7 @@ import sys, re, time
 from pathlib import Path
 import numpy as np
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QApplication, QLineEdit, QPushButton, QTextEdit, QHBoxLayout, QVBoxLayout, QWidget)
+from PyQt5.QtWidgets import (QApplication, QLineEdit, QPushButton, QTextEdit, QHBoxLayout, QVBoxLayout, QWidget, QCheckBox, QButtonGroup)
 from PyQt5.QtCore import QTimer
 from vispy import scene, app as vispy_app
 from solver_v2_6 import SolverV2_6 as Solver
@@ -54,6 +54,7 @@ class SolverUI(QtWidgets.QMainWindow):
         self.M = M
         self.seed = seed
         self.cell_size = cell_size
+        self.selected_mode = 'row_wise'
 
         # ----- solver instance -----
         self.solver = Solver(M=M, seed=seed)
@@ -79,6 +80,8 @@ class SolverUI(QtWidgets.QMainWindow):
 
         self.showMaximized()
 
+    def on_solver(self, mode):
+        return self.on_run_solver(mode)
 
     # ---------- UI scaffold ----------
     def _build_ui(self):
@@ -87,6 +90,39 @@ class SolverUI(QtWidgets.QMainWindow):
         vbox = QVBoxLayout(central)
         vbox.setContentsMargins(10, 10, 10, 10)
         vbox.setSpacing(8)
+
+        # Row 0: mode selection (exclusive checkboxes)
+        row_modes = QHBoxLayout()
+        self.cb_row    = QCheckBox("row_wise")
+        self.cb_sort1D = QCheckBox("sorting_network")
+        self.cb_sort2D = QCheckBox("sorting_network_2D")
+
+        self.mode_group = QButtonGroup(self)
+        self.mode_group.setExclusive(True)
+        self.mode_group.addButton(self.cb_row, 0)
+        self.mode_group.addButton(self.cb_sort1D, 1)
+        self.mode_group.addButton(self.cb_sort2D, 2)
+        self.cb_row.setChecked(True)
+
+        def _on_mode_clicked(_checked):
+            if self.cb_row.isChecked():
+                self.selected_mode = 'row_wise'
+            elif self.cb_sort1D.isChecked():
+                self.selected_mode = 'sorting_network'
+            elif self.cb_sort2D.isChecked():
+                self.selected_mode = 'sorting_network_2D'
+
+        self.cb_row.toggled.connect(_on_mode_clicked)
+        self.cb_sort1D.toggled.connect(_on_mode_clicked)
+        self.cb_sort2D.toggled.connect(_on_mode_clicked)
+
+        row_modes.addWidget(self.cb_row)
+        row_modes.addWidget(self.cb_sort1D)
+        row_modes.addWidget(self.cb_sort2D)
+        row_modes.addStretch(1)
+        vbox.addLayout(row_modes)
+
+
 
         # Row 1: moves + run button
         row1 = QHBoxLayout()
@@ -97,15 +133,10 @@ class SolverUI(QtWidgets.QMainWindow):
         self.move_entry.textChanged.connect(lambda _: self.on_moves_changed(live=True))
         self.move_entry.setMinimumHeight(36)
         row1.addWidget(self.move_entry, 3)
-
-        self.run_btn = QPushButton("[2.] Apply solver_v2_6 (parallelized row/column-wise, sorting network)")
-        self.run_btn.setMinimumHeight(44)
-        self.run_btn.clicked.connect(self.on_run_solver)
-        row1.addWidget(self.run_btn, 1)
-
         vbox.addLayout(row1)
 
         # Row 2: basic actions
+        
         row2 = QHBoxLayout()
         row2.setSpacing(8)
 
@@ -113,14 +144,13 @@ class SolverUI(QtWidgets.QMainWindow):
         self.scramble_btn.clicked.connect(self.on_scramble)
         row2.addWidget(self.scramble_btn)
 
+        self.run_btn = QPushButton("[2.] Apply solver_v2_6 (parallelized 1D or sorting_network_1D or sorting_network_2D)")
+        self.run_btn.clicked.connect(lambda _: self.on_run_solver(self.selected_mode))  # or on_solver
+        row2.addWidget(self.run_btn)
+
         self.play_parallel_btn = QPushButton("[3.] Play solution in UI (recommended only for M <= 30)")
         self.play_parallel_btn.setToolTip("Play wave_*_parallel.txt from latest run_dir")
-        self.play_parallel_btn.clicked.connect(self.play_parallel_solution)
-        row2.addWidget(self.play_parallel_btn)
-        
-        self.play_parallel_btn = QPushButton("[3b.] Play 2D-parallel solution in UI (recommended only for M <= 30)")
-        self.play_parallel_btn.setToolTip("Play wave_*_parallel.txt from latest run_dir")
-        self.play_parallel_btn.clicked.connect(self.play_2D_parallel_solution)
+        self.play_parallel_btn.clicked.connect(lambda: self.play_solution())
         row2.addWidget(self.play_parallel_btn)
 
         row2.addStretch(1)
@@ -252,21 +282,22 @@ class SolverUI(QtWidgets.QMainWindow):
     def on_scramble(self):
         self.solver.scramble_all_orbits()
         self.baseline_subcell_color = self.solver.subcell_color.copy()
-        self.output.append("Scrambled (baseline updated).")
+        self.output.append("Scrambled.")
         self.update_image()
 
     # ---------- run solver (pipeline) ----------
-    def on_run_solver(self):
+    def on_run_solver(self, mode=None):
+        if mode is None:
+            mode = getattr(self, 'selected_mode', 'row_wise')
         self.output.append("▶️  Running solver_v2_6 pipeline …")
         QApplication.processEvents()
 
-        # hard-sync solver state with the UI baseline (the scramble you see)
         if self.baseline_subcell_color is not None:
             self.solver.subcell_color = self.baseline_subcell_color.copy()
             self.solver.baseline_subcell_color = self.baseline_subcell_color.copy()
         t0 = time.time()
         try:
-            self.solver.run_pipeline(scramble=False, mode="sorting_network", sector_count=1)  
+            self.solver.run_pipeline(scramble=False, mode=mode, sector_count=1)  
             self.output.append(f"✅ Done. Outputs in: {self.solver.run_dir}")
         except Exception as e:
             self.output.append(f"✖ solver failed: {e}")
@@ -274,26 +305,27 @@ class SolverUI(QtWidgets.QMainWindow):
             self.output.append(f"Elapsed: {time.time() - t0:.2f}s")
             
     # ---------- solution playback ----------
-    def play_parallel_solution(self):
-        """Load wave_*_parallel.txt from current run_dir and animate."""
+    def play_solution(self, mode=None):
+        mode = self.selected_mode if mode is None else mode
         run_dir = Path(self.solver.run_dir)
-        wave_files = sorted(
-            [p for p in run_dir.glob("wave_*_parallel.txt")],
-            key=lambda p: int(re.search(r"wave_(\d+)_parallel\.txt", p.name).group(1))
-                if re.search(r"wave_(\d+)_parallel\.txt", p.name) else 10**9
-        )
-        if not wave_files:
-            self.output.append("No wave_*_parallel.txt files in run_dir.")
+
+        if mode == 'sorting_network_2D':
+            files = [run_dir / "solution.txt"] if (run_dir / "solution.txt").exists() else []
+            empty_msg = "No solution.txt file in run_dir."
+        else:
+            wave_re = re.compile(r"wave_(\d+)_parallel\.txt$")
+            waves = sorted(
+                (p for p in run_dir.glob("wave_*_parallel.txt") if wave_re.search(p.name)),
+                key=lambda p: int(wave_re.search(p.name).group(1))
+            )
+            files = waves
+            empty_msg = "No wave_*_parallel.txt files in run_dir."
+
+        if not files:
+            self.output.append(empty_msg)
             return
-        self._start_animation_from_files(wave_files)
-        
-    def play_2D_parallel_solution(self):  # play solution.txt:
-        run_dir = Path(self.solver.run_dir)
-        solution_file = run_dir / "solution.txt"
-        if not solution_file.exists():
-            self.output.append("No solution.txt file in run_dir.")
-            return
-        self._start_animation_from_files([solution_file])
+        self._start_animation_from_files(files)
+
 
     def _start_animation_from_files(self, files):
         try:
@@ -424,9 +456,10 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=10, seed=101, cell_size=1)
+    win = SolverUI(M=20, seed=103, cell_size=1)
     win.show()
     sys.exit(qapp.exec_())
 
 if __name__ == "__main__":
     main()
+    

@@ -492,13 +492,16 @@ class SolverV2_6:
             )
             return total, per_wave_counts, per_wave_times       
 
-    def run_pipeline(self, *, scramble: bool = False, mode: str, sector_count: int):
+    def run_pipeline(self, scramble: bool = False, mode: str = 'row_wise', sector_count: int = 1):
+        if mode not in ('row_wise', 'sorting_network', 'sorting_network_2D'):
+            raise ValueError(f"Unknown mode: {mode}")        
         t_pipeline0 = perf_counter()
         if scramble:
             self.scramble_all_orbits()
             self.baseline_subcell_color = self.subcell_color.copy()
         if self.baseline_subcell_color is None:
             self.baseline_subcell_color = self.subcell_color.copy()
+            
 
         self.sw.start("save_state")
         save_orbits_to_txt(self.subcell_color, self.M, str(self.run_dir / "cube_state.txt"))
@@ -656,6 +659,6 @@ def write_big_solution_file(sol_dir: str, run_dir: str, out_name: str = "solutio
     return out_path
 
 if __name__ == "__main__":
-    M = 10
+    M = 20
     solver = SolverV2_6(M=M)
-    solver.run_pipeline(scramble=True, mode="sorting_network", sector_count=1)
+    solver.run_pipeline(scramble=True, mode="row_wise", sector_count=1)

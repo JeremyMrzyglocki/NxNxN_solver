@@ -817,6 +817,8 @@ void print_state(string state){
 
 void sorting_via_sorting_network(string state){
 
+    //ULFRBD
+
     for (size_t i = 0; i < 24; ++i) { 
         switch (state[i]) {
             case 'W': state[i] = '0'; break;
@@ -832,171 +834,111 @@ void sorting_via_sorting_network(string state){
     print_state(state);
     cout << endl;
 
-    cout << endl << "Layer 1:" << endl;
-    layer_1.clear();
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 5), 0, 5, 1);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 3), 1, 3, 1);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 4), 2, 4, 1);
+cout << endl << "Layer 1:" << endl;
+layer_1.clear();
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 4), 0, 4, 1);  // (0,5) → (0,4)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 1);  // (1,3) → (1,2)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 3), 5, 3, 1);  // (2,4) → (5,3)
 
-    for (const auto& cyc : layer_1)
-        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
-    cout << endl;
-    apply_cycles(state, layer_1);
-    print_state(state);
-
-    
-
-    cout << endl << endl << "Layer 2:" << endl;
-    layer_2.clear();   
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 2);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 2);
-
-    for (const auto& cyc : layer_2)
-        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
-    cout << endl;
-    apply_cycles(state, layer_2);
-    print_state(state);
+for (const auto& cyc : layer_1)
+    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+         << cyc[3] << " and " << cyc[4] << "" << endl;
+cout << endl;
+apply_cycles(state, layer_1);
+print_state(state);
 
 
-    cout << endl <<  endl << "Layer 3:" << endl;
-    layer_3.clear();  
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 3), 0, 3, 3);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 5), 2, 5, 3);
 
-    for (const auto& cyc : layer_3)
-        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
-    cout << endl;
-    apply_cycles(state, layer_3);
-    print_state(state);
+cout << endl << endl << "Layer 2:" << endl;
+layer_2.clear();   
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 5), 1, 5, 2);  // (1,2) → (1,5)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 2);  // (3,4) → (2,3)
 
-    cout << endl <<  endl << "Layer 4:" << endl;
-    layer_4.clear();  
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 1), 0, 1, 4);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 4);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 4, 5), 4, 5, 4);
+for (const auto& cyc : layer_2)
+    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+         << cyc[3] << " and " << cyc[4] << "" << endl;
+cout << endl;
+apply_cycles(state, layer_2);
+print_state(state);
 
-    for (const auto& cyc : layer_4)
-        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
-    cout << endl;
-    apply_cycles(state, layer_4);
-    print_state(state);
-    
-    cout << endl <<  endl << "Layer 5:" << endl;
-    layer_5.clear(); 
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 5);
-    mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 5);
 
-    for (const auto& cyc : layer_5)
-        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " << cyc[3] << " and " << cyc[4] << "" << endl;
-    cout << endl;
-    apply_cycles(state, layer_5);
-    print_state(state);
-    cout << endl;
+
+cout << endl <<  endl << "Layer 3:" << endl;
+layer_3.clear();  
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 2), 0, 2, 3);  // (0,3) → (0,2)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 4), 5, 4, 3);  // (2,5) → (5,4)
+
+for (const auto& cyc : layer_3)
+    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+         << cyc[3] << " and " << cyc[4] << "" << endl;
+cout << endl;
+apply_cycles(state, layer_3);
+print_state(state);
+
+
+
+cout << endl <<  endl << "Layer 4:" << endl;
+layer_4.clear();  
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 1), 0, 1, 4);  // (0,1) → (0,1)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 2), 5, 2, 4);  // (2,3) → (5,2)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 4);  // (4,5) → (3,4)
+
+for (const auto& cyc : layer_4)
+    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+         << cyc[3] << " and " << cyc[4] << "" << endl;
+cout << endl;
+apply_cycles(state, layer_4);
+print_state(state);
+
+
+
+cout << endl <<  endl << "Layer 5:" << endl;
+layer_5.clear(); 
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 5), 1, 5, 5);  // (1,2) → (1,5)
+mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 5);  // (3,4) → (2,3)
+
+for (const auto& cyc : layer_5)
+    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+         << cyc[3] << " and " << cyc[4] << "" << endl;
+cout << endl;
+apply_cycles(state, layer_5);
+print_state(state);
+cout << endl;
+
 
 }
 
+
+static inline int abs1_index(int p, int f1, int f2) {
+    // Map local 1..8 (over faces f1,f2) -> absolute 1-based index in 24-array
+    return (p <= 4) ? (p + 4*f1) : (p + (4*f2 - 4));
+}
 
 void translate_and_flush_into_file(int orbit1, int orbit2, const std::string& outdir) {
-    std::ofstream o1 (outdir + "/cycles_wave1.txt",  std::ios::app);
-    std::ofstream o2 (outdir + "/cycles_wave2.txt",  std::ios::app);
-    std::ofstream o3 (outdir + "/cycles_wave3.txt",  std::ios::app);
-    std::ofstream o4 (outdir + "/cycles_wave4.txt",  std::ios::app);
-    std::ofstream o5 (outdir + "/cycles_wave5.txt",  std::ios::app);
+    std::ofstream o1 (outdir + "/cycles_wave1.txt", std::ios::app);
+    std::ofstream o2 (outdir + "/cycles_wave2.txt", std::ios::app);
+    std::ofstream o3 (outdir + "/cycles_wave3.txt", std::ios::app);
+    std::ofstream o4 (outdir + "/cycles_wave4.txt", std::ios::app);
+    std::ofstream o5 (outdir + "/cycles_wave5.txt", std::ios::app);
 
-
-    for (const auto& cyc : layer_1) {
-        int a = 0; int b = 0; int c = 0;
-        if (cyc[3] == 0 && cyc[4] == 5) {
-            if (cyc[0] >= 5) {a = 16; } else { a = 0; }
-            if (cyc[1] >= 5) {b = 16; } else { b = 0; }
-            if (cyc[2] >= 5) {c = 16; } else { c = 0; }
+    auto emit_layer = [&](std::ofstream& out, const std::vector<std::vector<int>>& L) {
+        for (const auto& cyc : L) {
+            int f1 = cyc[3], f2 = cyc[4];
+            int p1 = abs1_index(cyc[0], f1, f2);
+            int p2 = abs1_index(cyc[1], f1, f2);
+            int p3 = abs1_index(cyc[2], f1, f2);
+            out << "orbit(" << orbit1 << "," << orbit2 << ") - rot("
+                << p1 << "," << p2 << "," << p3 << ")\n";
         }
-        else if (cyc[3] == 1 && cyc[4] == 3) {
-            if (cyc[0] >= 5) {a = 8; } else { a = 4; }
-            if (cyc[1] >= 5) {b = 8; } else { b = 4; }
-            if (cyc[2] >= 5) {c = 8; } else { c = 4; }
-        }
-        else if (cyc[3] == 2 && cyc[4] == 4) {
-            if (cyc[0] >= 5) {a = 12; } else { a = 8; }
-            if (cyc[1] >= 5) {b = 12; } else { b = 8; }
-            if (cyc[2] >= 5) {c = 12; } else { c = 8; }
-        }
-        o1 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
+    };
 
-    }
-
-
-    for (const auto& cyc : layer_2) {
-        int a = 0; int b = 0; int c = 0;
-        if (cyc[3] == 1 && cyc[4] == 2) {
-            if (cyc[0] >= 5) {a = 4; } else { a = 4; }
-            if (cyc[1] >= 5) {b = 4; } else { b = 4; }
-            if (cyc[2] >= 5) {c = 4; } else { c = 4; }
-        }
-        else if (cyc[3] == 3 && cyc[4] == 4) {
-            if (cyc[0] >= 5) {a = 12; } else { a = 12; }
-            if (cyc[1] >= 5) {b = 12; } else { b = 12; }
-            if (cyc[2] >= 5) {c = 12; } else { c = 12; }
-        }
-        o2 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
-
-    }
-
-
-
-    for (const auto& cyc : layer_3) {
-        int a = 0; int b = 0; int c = 0;
-        if (cyc[3] == 0 && cyc[4] == 3) {
-            if (cyc[0] >= 5) {a = 8; } else { a = 0; }
-            if (cyc[1] >= 5) {b = 8; } else { b = 0; }
-            if (cyc[2] >= 5) {c = 8; } else { c = 0; }
-        }
-        else if (cyc[3] == 2 && cyc[4] == 5) {
-            if (cyc[0] >= 5) {a = 16; } else { a = 8; }
-            if (cyc[1] >= 5) {b = 16; } else { b = 8; }
-            if (cyc[2] >= 5) {c = 16; } else { c = 8; }
-        }
-        o3 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
-
-    }
-    for (const auto& cyc : layer_4) {
-        int a = 0; int b = 0; int c = 0;
-        if (cyc[3] == 0 && cyc[4] == 1) {
-            if (cyc[0] >= 5) {a = 0; } else { a = 0; }
-            if (cyc[1] >= 5) {b = 0; } else { b = 0; }
-            if (cyc[2] >= 5) {c = 0; } else { c = 0; }
-        }
-        else if (cyc[3] == 2 && cyc[4] == 3) {
-            if (cyc[0] >= 5) {a = 8; } else { a = 8; }
-            if (cyc[1] >= 5) {b = 8; } else { b = 8; }
-            if (cyc[2] >= 5) {c = 8; } else { c = 8; }
-        }
-        else if (cyc[3] == 4 && cyc[4] == 5) {
-            if (cyc[0] >= 5) {a = 16; } else { a = 16; }
-            if (cyc[1] >= 5) {b = 16; } else { b = 16; }
-            if (cyc[2] >= 5) {c = 16; } else { c = 16; }
-        }
-        o4 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
-
-    }
-
-
-    for (const auto& cyc : layer_5) {
-        int a = 0; int b = 0; int c = 0;
-        if (cyc[3] == 1 && cyc[4] == 2) {
-            if (cyc[0] >= 5) {a = 4; } else { a = 4; }
-            if (cyc[1] >= 5) {b = 4; } else { b = 4; }
-            if (cyc[2] >= 5) {c = 4; } else { c = 4; }
-        }
-        else if (cyc[3] == 3 && cyc[4] == 4) {
-            if (cyc[0] >= 5) {a = 12; } else { a = 12; }
-            if (cyc[1] >= 5) {b = 12; } else { b = 12; }
-            if (cyc[2] >= 5) {c = 12; } else { c = 12; }
-        }
-        o5 << "orbit(" << orbit1 << "," << orbit2 << ") - rot(" << cyc[0]+a << "," << cyc[1]+b << "," << cyc[2]+c << ")\n";
-
-    }
+    emit_layer(o1, layer_1);
+    emit_layer(o2, layer_2);
+    emit_layer(o3, layer_3);
+    emit_layer(o4, layer_4);
+    emit_layer(o5, layer_5);
 }
+
 
 
 // int main() {
@@ -1053,7 +995,6 @@ int main(int argc, char** argv) {
 
     return 0;
 }
-
 
 
 
