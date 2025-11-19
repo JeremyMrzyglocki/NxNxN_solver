@@ -39,13 +39,12 @@ inline void add_cycle_deferred(int a, int b, int c, int d, int e, int layer) {
 
 
 static inline bool should_defer(int a, int b, int c, int face1, int face2, int layer) {
-    // 1) Local check (1..8)
-    // Example sets (fill with the cases you want to defer)
-static const set<tuple<int,int,int>> LOCAL_TRIPLES_TO_DEFER = {
-    /* e.g. make (1,2,3) defer regardless of faces/layer: */ {4,8,7},{4,7,8},{2,6,7},{4,5,8},{2,8,3},{2,7,1}
-};
-    if (LOCAL_TRIPLES_TO_DEFER.count({a,b,c})) return true;
-    return false;
+    static const set<tuple<int,int,int>> LOCAL_TRIPLES_TO_DEFER = {
+        {4,8,7},{4,7,8},{2,6,7},{4,5,8},{2,8,3},{2,7,1} // These are the third and forth triples in cycle_tables_v2.csv
+    };
+        if (LOCAL_TRIPLES_TO_DEFER.count({a,b,c})) 
+            return true;
+        return false;
 }
 
 
@@ -121,9 +120,6 @@ string compute_face_swap_full_orbit(const std::string& input, int face1, int fac
 
     // CASE A (ssss tbbb, ssss ttbb, ssss tttb, ssss tttt)
     if ((count_threshold_in_both_sorted == 1) || (count_below_threshold_in_both_sorted == 4)) { // NO THRESHHOLD DUPLICATE (simple case)
-    ///cout << "marker2\n " << both[0] << both[1] << both[2] << both[3] << both[4] << both[5] << both[6] << both[7] << "---\n";
-    ///cout << "marker2\n " << both_sorted[0] << both_sorted[1] << both_sorted[2] << both_sorted[3] << both_sorted[4] << both_sorted[5] << both_sorted[6] << both_sorted[7] << "---\n";
-    ///cout << "threshold value: " << threshold_value << "\n";
 
         for (short i = 0; i < 4; i++) {
             if (both[i] < threshold_value) { both_pattern[i] = '0'; } // solved
@@ -500,7 +496,7 @@ string compute_face_swap_full_orbit(const std::string& input, int face1, int fac
 string random_state(){
     //string state = "000011112222333344445555";
     string state = "WWWWOOOOYYYYGGGGRRRRBBBB";
-    shuffle(state.begin(), state.end(), std::mt19937(std::random_device{}()));
+    shuffle(state.begin(), state.end(), mt19937(random_device{}()));
     return state;
 }
 
@@ -591,7 +587,6 @@ static vector<CsvSequence> parse_sequences_cell(const string& cellRaw) {
     return all;
 }
 
-// Load once (lazily) from a file you can configure here:
 static const char* kPatternCSV = "cycle_tables_v2.csv";
 
 static void load_pattern_table_once() {
@@ -630,6 +625,8 @@ static void load_pattern_table_once() {
 
 // Pick one sequence to apply for a pattern.
 // Current policy: prefer minimal length sequences; if multiple, take the first.
+
+// will delete this function if, I decide to only use cycle_tables with exactly one choice as algorithm.
 
 static const CsvSequence* pick_sequence_for_pattern(const string& pattern) { // option1
     load_pattern_table_once();
@@ -843,16 +840,16 @@ void sorting_via_sorting_network(string state){
     }
     
 void translate_and_flush_into_file(int orbit1, int orbit2, const std::string& outdir) {
-    ofstream o2 (outdir + "/cycles_wave3.txt",  std::ios::app);
-    ofstream o1 (outdir + "/cycles_wave1.txt",  std::ios::app);
-    ofstream o3 (outdir + "/cycles_wave5.txt",  std::ios::app);
-    ofstream o4 (outdir + "/cycles_wave7.txt",  std::ios::app);
-    ofstream o5 (outdir + "/cycles_wave9.txt",  std::ios::app);
 
+    ofstream o1 (outdir + "/cycles_wave1.txt",  std::ios::app);
     ofstream o1b(outdir + "/cycles_wave2.txt", std::ios::app);
+    ofstream o2 (outdir + "/cycles_wave3.txt",  std::ios::app);
     ofstream o2b(outdir + "/cycles_wave4.txt", std::ios::app);
+    ofstream o3 (outdir + "/cycles_wave5.txt",  std::ios::app);
     ofstream o3b(outdir + "/cycles_wave6.txt", std::ios::app);
+    ofstream o4 (outdir + "/cycles_wave7.txt",  std::ios::app);
     ofstream o4b(outdir + "/cycles_wave8.txt", std::ios::app);
+    ofstream o5 (outdir + "/cycles_wave9.txt",  std::ios::app);
     ofstream o5b(outdir + "/cycles_wave10.txt", std::ios::app);
 
     auto emit_layer = [&](ofstream& out, const vector<std::vector<int>>& L) {
@@ -894,7 +891,7 @@ void translate_and_flush_into_file(int orbit1, int orbit2, const std::string& ou
 
 int main(int argc, char** argv) {
     int M = 16;
-    string state_path = "cube_state.txt";
+    string state_path = "cube_state.txt"; // not ideal. Should rather use a bin-file later. Will save much storage.
     string outdir = ".";
 
     for (int i = 1; i < argc; ++i) {
