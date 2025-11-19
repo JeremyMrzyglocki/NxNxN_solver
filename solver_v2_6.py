@@ -352,7 +352,7 @@ class SolverV2_6:
         self.sw.stop("plan.total")
         
 
-    def run_orbit_point_generator(self, project_dir: Path | str, *, sector_count: int = 1) -> None:
+    def run_orbit_point_generator(self, project_dir: Path | str, *, sector_count) -> None:
         """
         From cycles_wave*.txt under project_dir:
         1) build orbit_points_wave_<w>/ folders
@@ -381,8 +381,8 @@ class SolverV2_6:
             )
 
         # choose table: prefer project-local copy
-        project_table = project_dir / "table_with_formula_v2.txt"
-        fallback_table = self.project_root / "table_with_formula_v2.txt"
+        project_table = project_dir / "table_reduced_22.txt"
+        fallback_table = self.project_root / "table_reduced_22.txt"
         table_path = project_table if project_table.exists() else fallback_table
 
         # call the new C++ generator
@@ -400,7 +400,7 @@ class SolverV2_6:
         print("✅ orbit_points_to_2D_algs finished.")
 
 
-    def run_rearrange_2D(self, project_dir: Path | str, *, sector_count: int = 1) -> str:
+    def run_rearrange_2D(self, project_dir: Path | str, *, sector_count) -> str:
         """
         Generate per-wave sol files + combined 2D solution inside project_dir.
         Returns path to project_dir/solution.txt
@@ -410,20 +410,10 @@ class SolverV2_6:
         # run generator (handles all waves and writes solution_2D_parallelization.txt)
         self.run_orbit_point_generator(project_dir, sector_count=sector_count)
 
-        combined = project_dir / "solution_2D_parallelization.txt"
         final_out = project_dir / "solution.txt"
 
-        if combined.exists():
-            with combined.open("r", encoding="utf-8", errors="ignore") as src, \
-                final_out.open("w", encoding="utf-8") as dst:
-                for line in src:
-                    if line.strip():
-                        dst.write(line if line.endswith("\n") else (line + "\n"))
-            print(f"🧩 Final solution written: {final_out}")
-            return str(final_out)
-
         # fallback: stitch whatever *.txt are present if the combined file is missing
-        out_path = write_big_solution_file(sol_dir=str(project_dir), run_dir=str(project_dir), out_name="solution.txt")
+        out_path = write_big_solution_file(sol_dir=str(project_dir), run_dir=str(project_dir), out_name="solution_2D.txt")
         return out_path or str(final_out)
 
 
@@ -492,11 +482,11 @@ class SolverV2_6:
             )
             return total, per_wave_counts, per_wave_times       
 
-    def run_pipeline(self, scramble: bool = False, mode: str = 'row_wise', sector_count: int = 1):
+    def run_pipeline(self, scramble: bool = False, mode: str = 'row_wise', sector_count: int = 6) -> None:
         if mode not in ('row_wise', 'sorting_network', 'sorting_network_2D'):
             raise ValueError(f"Unknown mode: {mode}")        
         t_pipeline0 = perf_counter()
-        if scramble:
+        if scramble:    
             self.scramble_all_orbits()
             self.baseline_subcell_color = self.subcell_color.copy()
         if self.baseline_subcell_color is None:
@@ -630,9 +620,14 @@ max_workers: int | None = None
     print(f"✅ Wrote {len(written)} files to: {out_dir}")
     return written
 
-def write_big_solution_file(sol_dir: str, run_dir: str, out_name: str = "solution.txt") -> str:
+def write_big_solution_file(sol_dir: str, run_dir: str, out_name: str = "solution_2D.txt") -> str:
     try:
-        parts = sorted(p for p in os.listdir(sol_dir) if p.endswith(".txt"))
+        parts = sorted(
+            (p for p in os.listdir(sol_dir)
+            if p.startswith("sol_wave") and p.endswith(".txt")),
+            key=lambda name: int(re.search(r"sol_wave(\d+)\.txt$", name).group(1))
+        )
+
     except FileNotFoundError:
         print(f"⚠️ Solutions directory not found: {sol_dir}")
         return ""
@@ -659,6 +654,6 @@ def write_big_solution_file(sol_dir: str, run_dir: str, out_name: str = "solutio
     return out_path
 
 if __name__ == "__main__":
-    M = 20
+    M = 15
     solver = SolverV2_6(M=M)
-    solver.run_pipeline(scramble=True, mode="row_wise", sector_count=1)
+    solver.run_pipeline(scramble=True, mode="sorting_network_2D", sector_count=6)

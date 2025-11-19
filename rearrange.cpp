@@ -297,7 +297,7 @@ static bool parse_cycles_line(const string& s, int& a, int& b, int& i, int& j, i
 int main(int argc, char** argv) {
     // defaults:
     string cycles_path = "cycles_wave1.txt";
-    string table_path  = "table_with_formula_v2.txt";
+    string table_path  = "table_reduced_22.txt";
     string out_path    = "wave_1_parallel.txt";
     int M = 800;
 

@@ -11,7 +11,7 @@
 #include <sstream>
 
 using namespace std;
-static string g_table_path = "table_with_formula_v2.txt";
+static string g_table_path = "table_reduced_22.txt";
 
 // ---------- Triples, hashing ----------
 struct Triple {
@@ -506,7 +506,7 @@ int main(int argc, char** argv) {
     if (!cli.table.empty()) {
         g_table_path = cli.table;
     } else {
-        std::filesystem::path candidate = std::filesystem::path(cli.project) / "table_with_formula_v2.txt";
+        std::filesystem::path candidate = std::filesystem::path(cli.project) / "table_reduced_22.txt";
         if (std::filesystem::exists(candidate)) g_table_path = candidate.string();
         // else keep default "table_with_formula_v2.txt" in CWD
     }

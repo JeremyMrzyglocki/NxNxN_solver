@@ -297,7 +297,7 @@ class SolverUI(QtWidgets.QMainWindow):
             self.solver.baseline_subcell_color = self.baseline_subcell_color.copy()
         t0 = time.time()
         try:
-            self.solver.run_pipeline(scramble=False, mode=mode, sector_count=1)  
+            self.solver.run_pipeline(scramble=False, mode=mode, sector_count=6)  
             self.output.append(f"✅ Done. Outputs in: {self.solver.run_dir}")
         except Exception as e:
             self.output.append(f"✖ solver failed: {e}")
@@ -310,7 +310,7 @@ class SolverUI(QtWidgets.QMainWindow):
         run_dir = Path(self.solver.run_dir)
 
         if mode == 'sorting_network_2D':
-            files = [run_dir / "solution.txt"] if (run_dir / "solution.txt").exists() else []
+            files = [run_dir / "solution_2D.txt"] if (run_dir / "solution_2D.txt").exists() else []
             empty_msg = "No solution.txt file in run_dir."
         else:
             wave_re = re.compile(r"wave_(\d+)_parallel\.txt$")
@@ -456,7 +456,7 @@ class SolverUI(QtWidgets.QMainWindow):
 def main():
     vispy_app.use_app('pyqt5')
     qapp = QApplication(sys.argv)
-    win = SolverUI(M=20, seed=103, cell_size=1)
+    win = SolverUI(M=15, seed=103, cell_size=1)
     win.show()
     sys.exit(qapp.exec_())
 

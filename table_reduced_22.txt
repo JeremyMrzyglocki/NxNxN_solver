@@ -1,0 +1,384 @@
+1,2,5  algorithm: U' L2 [3F', L 2B L'] L2 U  general: U' L2 [(11-p)F', L (11-q)B L'] L2 U
+1,2,6  algorithm: U' L [3F', L 2B L'] L' U  general: U' L [(11-p)F', L (11-q)B L'] L' U
+1,2,7  algorithm: U' [3F', L 2B L'] U  general: U' [(11-p)F', L (11-q)B L'] U
+1,2,8  algorithm: U' L' [3F', L 2B L'] L U  general: U' L' [(11-p)F', L (11-q)B L'] L U
+1,2,9  algorithm: U2 F2 [3R', F 2L F'] F2 U2  general: U2 F2 [(11-p)R', F (11-q)L F'] F2 U2
+1,2,10  algorithm: U2 F [3R', F 2L F'] F' U2  general: U2 F [(11-p)R', F (11-q)L F'] F' U2
+1,2,11  algorithm: U2 [3R', F 2L F'] U2  general: U2 [(11-p)R', F (11-q)L F'] U2
+1,2,12  algorithm: U2 F' [3R', F 2L F'] F U2  general: U2 F' [(11-p)R', F (11-q)L F'] F U2
+1,2,13  algorithm: U  R2 [3B', R 2F R'] R2 U'  general: U  R2 [(11-p)B', R (11-q)F R'] R2 U'
+1,2,14  algorithm: U  R [3B', R 2F R'] R' U'  general: U  R [(11-p)B', R (11-q)F R'] R' U'
+1,2,15  algorithm: U [3B', R 2F R'] U'  general: U [(11-p)B', R (11-q)F R'] U'
+1,2,16  algorithm: U  R' [3B', R 2F R'] R U'  general: U  R' [(11-p)B', R (11-q)F R'] R U'
+1,2,17  algorithm: B2 [3L', B 2R B'] B2  general: B2 [(11-p)L', B (11-q)R B'] B2
+1,2,18  algorithm: B [3L', B 2R B'] B'  general: B [(11-p)L', B (11-q)R B'] B'
+1,2,19  algorithm: [3L', B 2R B']  general: [(11-p)L', B (11-q)R B']
+1,2,20  algorithm: B' [3L', B 2R B'] B  general: B' [(11-p)L', B (11-q)R B'] B
+1,4,5  algorithm: L2 [L 2B L', 3F'] L2  general: L2 [L (11-q)B L', (11-p)F'] L2
+1,4,6  algorithm: L [L 2B L', 3F'] L'  general: L [L (11-q)B L', (11-p)F'] L'
+1,4,7  algorithm: [L 2B L', 3F']  general: [L (11-q)B L', (11-p)F']
+1,4,8  algorithm: L' [L 2B L', 3F'] L  general: L' [L (11-q)B L', (11-p)F'] L
+1,4,9  algorithm: U' F2 [F 2L F', 3R'] F2 U  general: U' F2 [F (11-q)L F', (11-p)R'] F2 U
+1,4,10  algorithm: U' F [F 2L F', 3R'] F' U  general: U' F [F (11-q)L F', (11-p)R'] F' U
+1,4,11  algorithm: U' [F 2L F', 3R'] U  general: U' [F (11-q)L F', (11-p)R'] U
+1,4,12  algorithm: U' F' [F 2L F', 3R'] F U  general: U' F' [F (11-q)L F', (11-p)R'] F U
+1,4,13  algorithm: U2 R2 [R 2F R', 3B'] R2 U2  general: U2 R2 [R (11-q)F R', (11-p)B'] R2 U2
+1,4,14  algorithm: U2 R [R 2F R', 3B'] R' U2  general: U2 R [R (11-q)F R', (11-p)B'] R' U2
+1,4,15  algorithm: U2 [R 2F R', 3B'] U2  general: U2 [R (11-q)F R', (11-p)B'] U2
+1,4,16  algorithm: U2 R' [R 2F R', 3B'] R U2  general: U2 R' [R (11-q)F R', (11-p)B'] R U2
+1,4,17  algorithm: U  B2 [B 2R B', 3L'] B2 U'  general: U  B2 [B (11-q)R B', (11-p)L'] B2 U'
+1,4,18  algorithm: U  B [B 2R B', 3L'] B' U'  general: U  B [B (11-q)R B', (11-p)L'] B' U'
+1,4,19  algorithm: U [B 2R B', 3L'] U'  general: U [B (11-q)R B', (11-p)L'] U'
+1,4,20  algorithm: U  B' [B 2R B', 3L'] B U'  general: U  B' [B (11-q)R B', (11-p)L'] B U'
+1,5,6  algorithm: U [3B', U 2F U'] U'  general: U [(11-p)B', U (11-q)F U'] U'
+1,5,8  algorithm: L  U [U 2F U', 3B'] U' L'  general: L  U [U (11-q)F U', (11-p)B'] U' L'
+1,6,7  algorithm: L' U [3B', U 2F U'] U' L  general: L' U [(11-p)B', U (11-q)F U'] U' L
+1,7,8  algorithm: L2 U [3B', U 2F U'] U' L2  general: L2 U [(11-p)B', U (11-q)F U'] U' L2
+1,9,10  algorithm: [3L', U 2R U']  general: [(11-p)L', U (11-q)R U']
+1,9,12  algorithm: F [U 2R U', 3L'] F'  general: F [U (11-q)R U', (11-p)L'] F'
+1,10,11  algorithm: F' [3L', U 2R U'] F  general: F' [(11-p)L', U (11-q)R U'] F
+1,11,12  algorithm: F2 [3L', U 2R U'] F2  general: F2 [(11-p)L', U (11-q)R U'] F2
+1,13,14  algorithm: U' [3F', U 2B U'] U  general: U' [(11-p)F', U (11-q)B U'] U
+1,13,16  algorithm: R  U' [U 2B U', 3F'] U R'  general: R  U' [U (11-q)B U', (11-p)F'] U R'
+1,14,15  algorithm: R' U' [3F', U 2B U'] U R  general: R' U' [(11-p)F', U (11-q)B U'] U R
+1,15,16  algorithm: R2 U' [3F', U 2B U'] U R2  general: R2 U' [(11-p)F', U (11-q)B U'] U R2
+1,17,18  algorithm: U2 [3R', U 2L U'] U2  general: U2 [(11-p)R', U (11-q)L U'] U2
+1,17,20  algorithm: B  U2 [U 2L U', 3R'] U2 B'  general: B  U2 [U (11-q)L U', (11-p)R'] U2 B'
+1,18,19  algorithm: B' U2 [3R', U 2L U'] U2 B  general: B' U2 [(11-p)R', U (11-q)L U'] U2 B
+1,19,20  algorithm: B2 U2 [3R', U 2L U'] U2 B2  general: B2 U2 [(11-p)R', U (11-q)L U'] U2 B2
+2,3,5  algorithm: U2 L2 [3F', L 2B L'] L2 U2  general: U2 L2 [(11-p)F', L (11-q)B L'] L2 U2
+2,3,6  algorithm: U2 L [3F', L 2B L'] L' U2  general: U2 L [(11-p)F', L (11-q)B L'] L' U2
+2,3,7  algorithm: U2 [3F', L 2B L'] U2  general: U2 [(11-p)F', L (11-q)B L'] U2
+2,3,8  algorithm: U2 L' [3F', L 2B L'] L U2  general: U2 L' [(11-p)F', L (11-q)B L'] L U2
+2,3,9  algorithm: U  F2 [3R', F 2L F'] F2 U'  general: U  F2 [(11-p)R', F (11-q)L F'] F2 U'
+2,3,10  algorithm: U  F [3R', F 2L F'] F' U'  general: U  F [(11-p)R', F (11-q)L F'] F' U'
+2,3,11  algorithm: U [3R', F 2L F'] U'  general: U [(11-p)R', F (11-q)L F'] U'
+2,3,12  algorithm: U  F' [3R', F 2L F'] F U'  general: U  F' [(11-p)R', F (11-q)L F'] F U'
+2,3,13  algorithm: R2 [3B', R 2F R'] R2  general: R2 [(11-p)B', R (11-q)F R'] R2
+2,3,14  algorithm: R [3B', R 2F R'] R'  general: R [(11-p)B', R (11-q)F R'] R'
+2,3,15  algorithm: [3B', R 2F R']  general: [(11-p)B', R (11-q)F R']
+2,3,16  algorithm: R' [3B', R 2F R'] R  general: R' [(11-p)B', R (11-q)F R'] R
+2,3,17  algorithm: U' B2 [3L', B 2R B'] B2 U  general: U' B2 [(11-p)L', B (11-q)R B'] B2 U
+2,3,18  algorithm: U' B [3L', B 2R B'] B' U  general: U' B [(11-p)L', B (11-q)R B'] B' U
+2,3,19  algorithm: U' [3L', B 2R B'] U  general: U' [(11-p)L', B (11-q)R B'] U
+2,3,20  algorithm: U' B' [3L', B 2R B'] B U  general: U' B' [(11-p)L', B (11-q)R B'] B U
+2,5,6  algorithm: [3B', U 2F U']  general: [(11-p)B', U (11-q)F U']
+2,5,8  algorithm: L [U 2F U', 3B'] L'  general: L [U (11-q)F U', (11-p)B'] L'
+2,6,7  algorithm: L' [3B', U 2F U'] L  general: L' [(11-p)B', U (11-q)F U'] L
+2,7,8  algorithm: L2 [3B', U 2F U'] L2  general: L2 [(11-p)B', U (11-q)F U'] L2
+2,9,10  algorithm: U' [3L', U 2R U'] U  general: U' [(11-p)L', U (11-q)R U'] U
+2,9,12  algorithm: F  U' [U 2R U', 3L'] U F'  general: F  U' [U (11-q)R U', (11-p)L'] U F'
+2,10,11  algorithm: F' U' [3L', U 2R U'] U F  general: F' U' [(11-p)L', U (11-q)R U'] U F
+2,11,12  algorithm: F2 U' [3L', U 2R U'] U F2  general: F2 U' [(11-p)L', U (11-q)R U'] U F2
+2,13,14  algorithm: U2 [3F', U 2B U'] U2  general: U2 [(11-p)F', U (11-q)B U'] U2
+2,13,16  algorithm: R  U2 [U 2B U', 3F'] U2 R'  general: R  U2 [U (11-q)B U', (11-p)F'] U2 R'
+2,14,15  algorithm: R' U2 [3F', U 2B U'] U2 R  general: R' U2 [(11-p)F', U (11-q)B U'] U2 R
+2,15,16  algorithm: R2 U2 [3F', U 2B U'] U2 R2  general: R2 U2 [(11-p)F', U (11-q)B U'] U2 R2
+2,17,18  algorithm: U [3R', U 2L U'] U'  general: U [(11-p)R', U (11-q)L U'] U'
+2,17,20  algorithm: B  U [U 2L U', 3R'] U' B'  general: B  U [U (11-q)L U', (11-p)R'] U' B'
+2,18,19  algorithm: B' U [3R', U 2L U'] U' B  general: B' U [(11-p)R', U (11-q)L U'] U' B
+2,19,20  algorithm: B2 U [3R', U 2L U'] U' B2  general: B2 U [(11-p)R', U (11-q)L U'] U' B2
+3,4,5  algorithm: U  L2 [3F', L 2B L'] L2 U'  general: U  L2 [(11-p)F', L (11-q)B L'] L2 U'
+3,4,6  algorithm: U  L [3F', L 2B L'] L' U'  general: U  L [(11-p)F', L (11-q)B L'] L' U'
+3,4,7  algorithm: U [3F', L 2B L'] U'  general: U [(11-p)F', L (11-q)B L'] U'
+3,4,8  algorithm: U  L' [3F', L 2B L'] L U'  general: U  L' [(11-p)F', L (11-q)B L'] L U'
+3,4,9  algorithm: F2 [3R', F 2L F'] F2  general: F2 [(11-p)R', F (11-q)L F'] F2
+3,4,10  algorithm: F [3R', F 2L F'] F'  general: F [(11-p)R', F (11-q)L F'] F'
+3,4,11  algorithm: [3R', F 2L F']  general: [(11-p)R', F (11-q)L F']
+3,4,12  algorithm: F' [3R', F 2L F'] F  general: F' [(11-p)R', F (11-q)L F'] F
+3,4,13  algorithm: U' R2 [3B', R 2F R'] R2 U  general: U' R2 [(11-p)B', R (11-q)F R'] R2 U
+3,4,14  algorithm: U' R [3B', R 2F R'] R' U  general: U' R [(11-p)B', R (11-q)F R'] R' U
+3,4,15  algorithm: U' [3B', R 2F R'] U  general: U' [(11-p)B', R (11-q)F R'] U
+3,4,16  algorithm: U' R' [3B', R 2F R'] R U  general: U' R' [(11-p)B', R (11-q)F R'] R U
+3,4,17  algorithm: U2 B2 [3L', B 2R B'] B2 U2  general: U2 B2 [(11-p)L', B (11-q)R B'] B2 U2
+3,4,18  algorithm: U2 B [3L', B 2R B'] B' U2  general: U2 B [(11-p)L', B (11-q)R B'] B' U2
+3,4,19  algorithm: U2 [3L', B 2R B'] U2  general: U2 [(11-p)L', B (11-q)R B'] U2
+3,4,20  algorithm: U2 B' [3L', B 2R B'] B U2  general: U2 B' [(11-p)L', B (11-q)R B'] B U2
+3,5,6  algorithm: U' [3B', U 2F U'] U  general: U' [(11-p)B', U (11-q)F U'] U
+3,5,8  algorithm: L  U' [U 2F U', 3B'] U L'  general: L  U' [U (11-q)F U', (11-p)B'] U L'
+3,6,7  algorithm: L' U' [3B', U 2F U'] U L  general: L' U' [(11-p)B', U (11-q)F U'] U L
+3,7,8  algorithm: L2 U' [3B', U 2F U'] U L2  general: L2 U' [(11-p)B', U (11-q)F U'] U L2
+3,9,10  algorithm: U2 [3L', U 2R U'] U2  general: U2 [(11-p)L', U (11-q)R U'] U2
+3,9,12  algorithm: F  U2 [U 2R U', 3L'] U2 F'  general: F  U2 [U (11-q)R U', (11-p)L'] U2 F'
+3,10,11  algorithm: F' U2 [3L', U 2R U'] U2 F  general: F' U2 [(11-p)L', U (11-q)R U'] U2 F
+3,11,12  algorithm: F2 U2 [3L', U 2R U'] U2 F2  general: F2 U2 [(11-p)L', U (11-q)R U'] U2 F2
+3,13,14  algorithm: U [3F', U 2B U'] U'  general: U [(11-p)F', U (11-q)B U'] U'
+3,13,16  algorithm: R  U [U 2B U', 3F'] U' R'  general: R  U [U (11-q)B U', (11-p)F'] U' R'
+3,14,15  algorithm: R' U [3F', U 2B U'] U' R  general: R' U [(11-p)F', U (11-q)B U'] U' R
+3,15,16  algorithm: R2 U [3F', U 2B U'] U' R2  general: R2 U [(11-p)F', U (11-q)B U'] U' R2
+3,17,18  algorithm: [3R', U 2L U']  general: [(11-p)R', U (11-q)L U']
+3,17,20  algorithm: B [U 2L U', 3R'] B'  general: B [U (11-q)L U', (11-p)R'] B'
+3,18,19  algorithm: B' [3R', U 2L U'] B  general: B' [(11-p)R', U (11-q)L U'] B
+3,19,20  algorithm: B2 [3R', U 2L U'] B2  general: B2 [(11-p)R', U (11-q)L U'] B2
+4,5,6  algorithm: U2 [3B', U 2F U'] U2  general: U2 [(11-p)B', U (11-q)F U'] U2
+4,5,8  algorithm: L  U2 [U 2F U', 3B'] U2 L'  general: L  U2 [U (11-q)F U', (11-p)B'] U2 L'
+4,6,7  algorithm: L' U2 [3B', U 2F U'] U2 L  general: L' U2 [(11-p)B', U (11-q)F U'] U2 L
+4,7,8  algorithm: L2 U2 [3B', U 2F U'] U2 L2  general: L2 U2 [(11-p)B', U (11-q)F U'] U2 L2
+4,9,10  algorithm: U [3L', U 2R U'] U'  general: U [(11-p)L', U (11-q)R U'] U'
+4,9,12  algorithm: F  U [U 2R U', 3L'] U' F'  general: F  U [U (11-q)R U', (11-p)L'] U' F'
+4,10,11  algorithm: F' U [3L', U 2R U'] U' F  general: F' U [(11-p)L', U (11-q)R U'] U' F
+4,11,12  algorithm: F2 U [3L', U 2R U'] U' F2  general: F2 U [(11-p)L', U (11-q)R U'] U' F2
+4,13,14  algorithm: [3F', U 2B U']  general: [(11-p)F', U (11-q)B U']
+4,13,16  algorithm: R [U 2B U', 3F'] R'  general: R [U (11-q)B U', (11-p)F'] R'
+4,14,15  algorithm: R' [3F', U 2B U'] R  general: R' [(11-p)F', U (11-q)B U'] R
+4,15,16  algorithm: R2 [3F', U 2B U'] R2  general: R2 [(11-p)F', U (11-q)B U'] R2
+4,17,18  algorithm: U' [3R', U 2L U'] U  general: U' [(11-p)R', U (11-q)L U'] U
+4,17,20  algorithm: B  U' [U 2L U', 3R'] U B'  general: B  U' [U (11-q)L U', (11-p)R'] U B'
+4,18,19  algorithm: B' U' [3R', U 2L U'] U B  general: B' U' [(11-p)R', U (11-q)L U'] U B
+4,19,20  algorithm: B2 U' [3R', U 2L U'] U B2  general: B2 U' [(11-p)R', U (11-q)L U'] U B2
+5,6,9  algorithm: L  F [3U', F 2D F'] F' L'  general: L  F [(11-p)U', F (11-q)D F'] F' L'
+5,6,10  algorithm: L [3U', F 2D F'] L'  general: L [(11-p)U', F (11-q)D F'] L'
+5,6,11  algorithm: L  F' [3U', F 2D F'] F L'  general: L  F' [(11-p)U', F (11-q)D F'] F L'
+5,6,12  algorithm: L  F2 [3U', F 2D F'] F2 L'  general: L  F2 [(11-p)U', F (11-q)D F'] F2 L'
+5,6,17  algorithm: L' B' [3D', B 2U B'] B L  general: L' B' [(11-p)D', B (11-q)U B'] B L
+5,6,18  algorithm: L' B2 [3D', B 2U B'] B2 L  general: L' B2 [(11-p)D', B (11-q)U B'] B2 L
+5,6,19  algorithm: L' B [3D', B 2U B'] B' L  general: L' B [(11-p)D', B (11-q)U B'] B' L
+5,6,20  algorithm: L' [3D', B 2U B'] L  general: L' [(11-p)D', B (11-q)U B'] L
+5,6,21  algorithm: L2 D [3F', D 2B D'] D' L2  general: L2 D [(11-p)F', D (11-q)B D'] D' L2
+5,6,22  algorithm: L2 [3F', D 2B D'] L2  general: L2 [(11-p)F', D (11-q)B D'] L2
+5,6,23  algorithm: L2 D' [3F', D 2B D'] D L2  general: L2 D' [(11-p)F', D (11-q)B D'] D L2
+5,6,24  algorithm: L2 D2 [3F', D 2B D'] D2 L2  general: L2 D2 [(11-p)F', D (11-q)B D'] D2 L2
+5,8,9  algorithm: L2 F [F 2D F', 3U'] F' L2  general: L2 F [F (11-q)D F', (11-p)U'] F' L2
+5,8,10  algorithm: L2 [F 2D F', 3U'] L2  general: L2 [F (11-q)D F', (11-p)U'] L2
+5,8,11  algorithm: L2 F' [F 2D F', 3U'] F L2  general: L2 F' [F (11-q)D F', (11-p)U'] F L2
+5,8,12  algorithm: L2 F2 [F 2D F', 3U'] F2 L2  general: L2 F2 [F (11-q)D F', (11-p)U'] F2 L2
+5,8,17  algorithm: B' [B 2U B', 3D'] B  general: B' [B (11-q)U B', (11-p)D'] B
+5,8,18  algorithm: B2 [B 2U B', 3D'] B2  general: B2 [B (11-q)U B', (11-p)D'] B2
+5,8,19  algorithm: B [B 2U B', 3D'] B'  general: B [B (11-q)U B', (11-p)D'] B'
+5,8,20  algorithm: [B 2U B', 3D']  general: [B (11-q)U B', (11-p)D']
+5,8,21  algorithm: L' D [D 2B D', 3F'] D' L  general: L' D [D (11-q)B D', (11-p)F'] D' L
+5,8,22  algorithm: L' [D 2B D', 3F'] L  general: L' [D (11-q)B D', (11-p)F'] L
+5,8,23  algorithm: L' D' [D 2B D', 3F'] D L  general: L' D' [D (11-q)B D', (11-p)F'] D L
+5,8,24  algorithm: L' D2 [D 2B D', 3F'] D2 L  general: L' D2 [D (11-q)B D', (11-p)F'] D2 L
+5,9,10  algorithm: F' L' [3D', L 2U L'] L F  general: F' L' [(11-p)D', L (11-q)U L'] L F
+5,9,12  algorithm: L' [L 2U L', 3D'] L  general: L' [L (11-q)U L', (11-p)D'] L
+5,10,11  algorithm: F2 L' [3D', L 2U L'] L F2  general: F2 L' [(11-p)D', L (11-q)U L'] L F2
+5,11,12  algorithm: F  L' [3D', L 2U L'] L F'  general: F  L' [(11-p)D', L (11-q)U L'] L F'
+5,17,18  algorithm: B  L [3U', L 2D L'] L' B'  general: B  L [(11-p)U', L (11-q)D L'] L' B'
+5,17,20  algorithm: B2 L [L 2D L', 3U'] L' B2  general: B2 L [L (11-q)D L', (11-p)U'] L' B2
+5,18,19  algorithm: L [3U', L 2D L'] L'  general: L [(11-p)U', L (11-q)D L'] L'
+5,19,20  algorithm: B' L [3U', L 2D L'] L' B  general: B' L [(11-p)U', L (11-q)D L'] L' B
+5,21,22  algorithm: D' [3B', L 2F L'] D  general: D' [(11-p)B', L (11-q)F L'] D
+5,21,24  algorithm: [L 2F L', 3B']  general: [L (11-q)F L', (11-p)B']
+5,22,23  algorithm: D2 [3B', L 2F L'] D2  general: D2 [(11-p)B', L (11-q)F L'] D2
+5,23,24  algorithm: D [3B', L 2F L'] D'  general: D [(11-p)B', L (11-q)F L'] D'
+6,7,9  algorithm: F [3U', F 2D F'] F'  general: F [(11-p)U', F (11-q)D F'] F'
+6,7,10  algorithm: [3U', F 2D F']  general: [(11-p)U', F (11-q)D F']
+6,7,11  algorithm: F' [3U', F 2D F'] F  general: F' [(11-p)U', F (11-q)D F'] F
+6,7,12  algorithm: F2 [3U', F 2D F'] F2  general: F2 [(11-p)U', F (11-q)D F'] F2
+6,7,17  algorithm: L2 B' [3D', B 2U B'] B L2  general: L2 B' [(11-p)D', B (11-q)U B'] B L2
+6,7,18  algorithm: L2 B2 [3D', B 2U B'] B2 L2  general: L2 B2 [(11-p)D', B (11-q)U B'] B2 L2
+6,7,19  algorithm: L2 B [3D', B 2U B'] B' L2  general: L2 B [(11-p)D', B (11-q)U B'] B' L2
+6,7,20  algorithm: L2 [3D', B 2U B'] L2  general: L2 [(11-p)D', B (11-q)U B'] L2
+6,7,21  algorithm: L  D [3F', D 2B D'] D' L'  general: L  D [(11-p)F', D (11-q)B D'] D' L'
+6,7,22  algorithm: L [3F', D 2B D'] L'  general: L [(11-p)F', D (11-q)B D'] L'
+6,7,23  algorithm: L  D' [3F', D 2B D'] D L'  general: L  D' [(11-p)F', D (11-q)B D'] D L'
+6,7,24  algorithm: L  D2 [3F', D 2B D'] D2 L'  general: L  D2 [(11-p)F', D (11-q)B D'] D2 L'
+6,9,10  algorithm: F' L2 [3D', L 2U L'] L2 F  general: F' L2 [(11-p)D', L (11-q)U L'] L2 F
+6,9,12  algorithm: L2 [L 2U L', 3D'] L2  general: L2 [L (11-q)U L', (11-p)D'] L2
+6,10,11  algorithm: F2 L2 [3D', L 2U L'] L2 F2  general: F2 L2 [(11-p)D', L (11-q)U L'] L2 F2
+6,11,12  algorithm: F  L2 [3D', L 2U L'] L2 F'  general: F  L2 [(11-p)D', L (11-q)U L'] L2 F'
+6,17,18  algorithm: B [3U', L 2D L'] B'  general: B [(11-p)U', L (11-q)D L'] B'
+6,17,20  algorithm: B2 [L 2D L', 3U'] B2  general: B2 [L (11-q)D L', (11-p)U'] B2
+6,18,19  algorithm: [3U', L 2D L']  general: [(11-p)U', L (11-q)D L']
+6,19,20  algorithm: B' [3U', L 2D L'] B  general: B' [(11-p)U', L (11-q)D L'] B
+6,21,22  algorithm: D' L' [3B', L 2F L'] L D  general: D' L' [(11-p)B', L (11-q)F L'] L D
+6,21,24  algorithm: L' [L 2F L', 3B'] L  general: L' [L (11-q)F L', (11-p)B'] L
+6,22,23  algorithm: D2 L' [3B', L 2F L'] L D2  general: D2 L' [(11-p)B', L (11-q)F L'] L D2
+6,23,24  algorithm: D  L' [3B', L 2F L'] L D'  general: D  L' [(11-p)B', L (11-q)F L'] L D'
+7,8,9  algorithm: L' F [3U', F 2D F'] F' L  general: L' F [(11-p)U', F (11-q)D F'] F' L
+7,8,10  algorithm: L' [3U', F 2D F'] L  general: L' [(11-p)U', F (11-q)D F'] L
+7,8,11  algorithm: L' F' [3U', F 2D F'] F L  general: L' F' [(11-p)U', F (11-q)D F'] F L
+7,8,12  algorithm: L' F2 [3U', F 2D F'] F2 L  general: L' F2 [(11-p)U', F (11-q)D F'] F2 L
+7,8,17  algorithm: L  B' [3D', B 2U B'] B L'  general: L  B' [(11-p)D', B (11-q)U B'] B L'
+7,8,18  algorithm: L  B2 [3D', B 2U B'] B2 L'  general: L  B2 [(11-p)D', B (11-q)U B'] B2 L'
+7,8,19  algorithm: L  B [3D', B 2U B'] B' L'  general: L  B [(11-p)D', B (11-q)U B'] B' L'
+7,8,20  algorithm: L [3D', B 2U B'] L'  general: L [(11-p)D', B (11-q)U B'] L'
+7,8,21  algorithm: D [3F', D 2B D'] D'  general: D [(11-p)F', D (11-q)B D'] D'
+7,8,22  algorithm: [3F', D 2B D']  general: [(11-p)F', D (11-q)B D']
+7,8,23  algorithm: D' [3F', D 2B D'] D  general: D' [(11-p)F', D (11-q)B D'] D
+7,8,24  algorithm: D2 [3F', D 2B D'] D2  general: D2 [(11-p)F', D (11-q)B D'] D2
+7,9,10  algorithm: F' L [3D', L 2U L'] L' F  general: F' L [(11-p)D', L (11-q)U L'] L' F
+7,9,12  algorithm: L [L 2U L', 3D'] L'  general: L [L (11-q)U L', (11-p)D'] L'
+7,10,11  algorithm: F2 L [3D', L 2U L'] L' F2  general: F2 L [(11-p)D', L (11-q)U L'] L' F2
+7,11,12  algorithm: F  L [3D', L 2U L'] L' F'  general: F  L [(11-p)D', L (11-q)U L'] L' F'
+7,17,18  algorithm: B  L' [3U', L 2D L'] L B'  general: B  L' [(11-p)U', L (11-q)D L'] L B'
+7,17,20  algorithm: B2 L' [L 2D L', 3U'] L B2  general: B2 L' [L (11-q)D L', (11-p)U'] L B2
+7,18,19  algorithm: L' [3U', L 2D L'] L  general: L' [(11-p)U', L (11-q)D L'] L
+7,19,20  algorithm: B' L' [3U', L 2D L'] L B  general: B' L' [(11-p)U', L (11-q)D L'] L B
+7,21,22  algorithm: D' L2 [3B', L 2F L'] L2 D  general: D' L2 [(11-p)B', L (11-q)F L'] L2 D
+7,21,24  algorithm: L2 [L 2F L', 3B'] L2  general: L2 [L (11-q)F L', (11-p)B'] L2
+7,22,23  algorithm: D2 L2 [3B', L 2F L'] L2 D2  general: D2 L2 [(11-p)B', L (11-q)F L'] L2 D2
+7,23,24  algorithm: D  L2 [3B', L 2F L'] L2 D'  general: D  L2 [(11-p)B', L (11-q)F L'] L2 D'
+8,9,10  algorithm: F' [3D', L 2U L'] F  general: F' [(11-p)D', L (11-q)U L'] F
+8,9,12  algorithm: [L 2U L', 3D']  general: [L (11-q)U L', (11-p)D']
+8,10,11  algorithm: F2 [3D', L 2U L'] F2  general: F2 [(11-p)D', L (11-q)U L'] F2
+8,11,12  algorithm: F [3D', L 2U L'] F'  general: F [(11-p)D', L (11-q)U L'] F'
+8,17,18  algorithm: B  L2 [3U', L 2D L'] L2 B'  general: B  L2 [(11-p)U', L (11-q)D L'] L2 B'
+8,17,20  algorithm: B2 L2 [L 2D L', 3U'] L2 B2  general: B2 L2 [L (11-q)D L', (11-p)U'] L2 B2
+8,18,19  algorithm: L2 [3U', L 2D L'] L2  general: L2 [(11-p)U', L (11-q)D L'] L2
+8,19,20  algorithm: B' L2 [3U', L 2D L'] L2 B  general: B' L2 [(11-p)U', L (11-q)D L'] L2 B
+8,21,22  algorithm: D' L [3B', L 2F L'] L' D  general: D' L [(11-p)B', L (11-q)F L'] L' D
+8,21,24  algorithm: L [L 2F L', 3B'] L'  general: L [L (11-q)F L', (11-p)B'] L'
+8,22,23  algorithm: D2 L [3B', L 2F L'] L' D2  general: D2 L [(11-p)B', L (11-q)F L'] L' D2
+8,23,24  algorithm: D  L [3B', L 2F L'] L' D'  general: D  L [(11-p)B', L (11-q)F L'] L' D'
+9,10,13  algorithm: F  R [3U', R 2D R'] R' F'  general: F  R [(11-p)U', R (11-q)D R'] R' F'
+9,10,14  algorithm: F [3U', R 2D R'] F'  general: F [(11-p)U', R (11-q)D R'] F'
+9,10,15  algorithm: F  R' [3U', R 2D R'] R F'  general: F  R' [(11-p)U', R (11-q)D R'] R F'
+9,10,16  algorithm: F  R2 [3U', R 2D R'] R2 F'  general: F  R2 [(11-p)U', R (11-q)D R'] R2 F'
+9,10,21  algorithm: F2 D2 [3R', D 2L D'] D2 F2  general: F2 D2 [(11-p)R', D (11-q)L D'] D2 F2
+9,10,22  algorithm: F2 D [3R', D 2L D'] D' F2  general: F2 D [(11-p)R', D (11-q)L D'] D' F2
+9,10,23  algorithm: F2 [3R', D 2L D'] F2  general: F2 [(11-p)R', D (11-q)L D'] F2
+9,10,24  algorithm: F2 D' [3R', D 2L D'] D F2  general: F2 D' [(11-p)R', D (11-q)L D'] D F2
+9,12,13  algorithm: F2 R [R 2D R', 3U'] R' F2  general: F2 R [R (11-q)D R', (11-p)U'] R' F2
+9,12,14  algorithm: F2 [R 2D R', 3U'] F2  general: F2 [R (11-q)D R', (11-p)U'] F2
+9,12,15  algorithm: F2 R' [R 2D R', 3U'] R F2  general: F2 R' [R (11-q)D R', (11-p)U'] R F2
+9,12,16  algorithm: F2 R2 [R 2D R', 3U'] R2 F2  general: F2 R2 [R (11-q)D R', (11-p)U'] R2 F2
+9,12,21  algorithm: F' D2 [D 2L D', 3R'] D2 F  general: F' D2 [D (11-q)L D', (11-p)R'] D2 F
+9,12,22  algorithm: F' D [D 2L D', 3R'] D' F  general: F' D [D (11-q)L D', (11-p)R'] D' F
+9,12,23  algorithm: F' [D 2L D', 3R'] F  general: F' [D (11-q)L D', (11-p)R'] F
+9,12,24  algorithm: F' D' [D 2L D', 3R'] D F  general: F' D' [D (11-q)L D', (11-p)R'] D F
+9,13,14  algorithm: R' F' [3D', F 2U F'] F R  general: R' F' [(11-p)D', F (11-q)U F'] F R
+9,13,16  algorithm: F' [F 2U F', 3D'] F  general: F' [F (11-q)U F', (11-p)D'] F
+9,14,15  algorithm: R2 F' [3D', F 2U F'] F R2  general: R2 F' [(11-p)D', F (11-q)U F'] F R2
+9,15,16  algorithm: R  F' [3D', F 2U F'] F R'  general: R  F' [(11-p)D', F (11-q)U F'] F R'
+9,21,22  algorithm: [3L', F 2R F']  general: [(11-p)L', F (11-q)R F']
+9,21,24  algorithm: D [F 2R F', 3L'] D'  general: D [F (11-q)R F', (11-p)L'] D'
+9,22,23  algorithm: D' [3L', F 2R F'] D  general: D' [(11-p)L', F (11-q)R F'] D
+9,23,24  algorithm: D2 [3L', F 2R F'] D2  general: D2 [(11-p)L', F (11-q)R F'] D2
+10,11,13  algorithm: R [3U', R 2D R'] R'  general: R [(11-p)U', R (11-q)D R'] R'
+10,11,14  algorithm: [3U', R 2D R']  general: [(11-p)U', R (11-q)D R']
+10,11,15  algorithm: R' [3U', R 2D R'] R  general: R' [(11-p)U', R (11-q)D R'] R
+10,11,16  algorithm: R2 [3U', R 2D R'] R2  general: R2 [(11-p)U', R (11-q)D R'] R2
+10,11,21  algorithm: F  D2 [3R', D 2L D'] D2 F'  general: F  D2 [(11-p)R', D (11-q)L D'] D2 F'
+10,11,22  algorithm: F  D [3R', D 2L D'] D' F'  general: F  D [(11-p)R', D (11-q)L D'] D' F'
+10,11,23  algorithm: F [3R', D 2L D'] F'  general: F [(11-p)R', D (11-q)L D'] F'
+10,11,24  algorithm: F  D' [3R', D 2L D'] D F'  general: F  D' [(11-p)R', D (11-q)L D'] D F'
+10,13,14  algorithm: R' F2 [3D', F 2U F'] F2 R  general: R' F2 [(11-p)D', F (11-q)U F'] F2 R
+10,13,16  algorithm: F2 [F 2U F', 3D'] F2  general: F2 [F (11-q)U F', (11-p)D'] F2
+10,14,15  algorithm: R2 F2 [3D', F 2U F'] F2 R2  general: R2 F2 [(11-p)D', F (11-q)U F'] F2 R2
+10,15,16  algorithm: R  F2 [3D', F 2U F'] F2 R'  general: R  F2 [(11-p)D', F (11-q)U F'] F2 R'
+10,21,22  algorithm: F' [3L', F 2R F'] F  general: F' [(11-p)L', F (11-q)R F'] F
+10,21,24  algorithm: D  F' [F 2R F', 3L'] F D'  general: D  F' [F (11-q)R F', (11-p)L'] F D'
+10,22,23  algorithm: D' F' [3L', F 2R F'] F D  general: D' F' [(11-p)L', F (11-q)R F'] F D
+10,23,24  algorithm: D2 F' [3L', F 2R F'] F D2  general: D2 F' [(11-p)L', F (11-q)R F'] F D2
+11,12,13  algorithm: F' R [3U', R 2D R'] R' F  general: F' R [(11-p)U', R (11-q)D R'] R' F
+11,12,14  algorithm: F' [3U', R 2D R'] F  general: F' [(11-p)U', R (11-q)D R'] F
+11,12,15  algorithm: F' R' [3U', R 2D R'] R F  general: F' R' [(11-p)U', R (11-q)D R'] R F
+11,12,16  algorithm: F' R2 [3U', R 2D R'] R2 F  general: F' R2 [(11-p)U', R (11-q)D R'] R2 F
+11,12,21  algorithm: D2 [3R', D 2L D'] D2  general: D2 [(11-p)R', D (11-q)L D'] D2
+11,12,22  algorithm: D [3R', D 2L D'] D'  general: D [(11-p)R', D (11-q)L D'] D'
+11,12,23  algorithm: [3R', D 2L D']  general: [(11-p)R', D (11-q)L D']
+11,12,24  algorithm: D' [3R', D 2L D'] D  general: D' [(11-p)R', D (11-q)L D'] D
+11,13,14  algorithm: R' F [3D', F 2U F'] F' R  general: R' F [(11-p)D', F (11-q)U F'] F' R
+11,13,16  algorithm: F [F 2U F', 3D'] F'  general: F [F (11-q)U F', (11-p)D'] F'
+11,14,15  algorithm: R2 F [3D', F 2U F'] F' R2  general: R2 F [(11-p)D', F (11-q)U F'] F' R2
+11,15,16  algorithm: R  F [3D', F 2U F'] F' R'  general: R  F [(11-p)D', F (11-q)U F'] F' R'
+11,21,22  algorithm: F2 [3L', F 2R F'] F2  general: F2 [(11-p)L', F (11-q)R F'] F2
+11,21,24  algorithm: D  F2 [F 2R F', 3L'] F2 D'  general: D  F2 [F (11-q)R F', (11-p)L'] F2 D'
+11,22,23  algorithm: D' F2 [3L', F 2R F'] F2 D  general: D' F2 [(11-p)L', F (11-q)R F'] F2 D
+11,23,24  algorithm: D2 F2 [3L', F 2R F'] F2 D2  general: D2 F2 [(11-p)L', F (11-q)R F'] F2 D2
+12,13,14  algorithm: R' [3D', F 2U F'] R  general: R' [(11-p)D', F (11-q)U F'] R
+12,13,16  algorithm: [F 2U F', 3D']  general: [F (11-q)U F', (11-p)D']
+12,14,15  algorithm: R2 [3D', F 2U F'] R2  general: R2 [(11-p)D', F (11-q)U F'] R2
+12,15,16  algorithm: R [3D', F 2U F'] R'  general: R [(11-p)D', F (11-q)U F'] R'
+12,21,22  algorithm: F [3L', F 2R F'] F'  general: F [(11-p)L', F (11-q)R F'] F'
+12,21,24  algorithm: D  F [F 2R F', 3L'] F' D'  general: D  F [F (11-q)R F', (11-p)L'] F' D'
+12,22,23  algorithm: D' F [3L', F 2R F'] F' D  general: D' F [(11-p)L', F (11-q)R F'] F' D
+12,23,24  algorithm: D2 F [3L', F 2R F'] F' D2  general: D2 F [(11-p)L', F (11-q)R F'] F' D2
+13,14,17  algorithm: R  B [3U', B 2D B'] B' R'  general: R  B [(11-p)U', B (11-q)D B'] B' R'
+13,14,18  algorithm: R [3U', B 2D B'] R'  general: R [(11-p)U', B (11-q)D B'] R'
+13,14,19  algorithm: R  B' [3U', B 2D B'] B R'  general: R  B' [(11-p)U', B (11-q)D B'] B R'
+13,14,20  algorithm: R  B2 [3U', B 2D B'] B2 R'  general: R  B2 [(11-p)U', B (11-q)D B'] B2 R'
+13,14,21  algorithm: R2 D' [3B', D 2F D'] D R2  general: R2 D' [(11-p)B', D (11-q)F D'] D R2
+13,14,22  algorithm: R2 D2 [3B', D 2F D'] D2 R2  general: R2 D2 [(11-p)B', D (11-q)F D'] D2 R2
+13,14,23  algorithm: R2 D [3B', D 2F D'] D' R2  general: R2 D [(11-p)B', D (11-q)F D'] D' R2
+13,14,24  algorithm: R2 [3B', D 2F D'] R2  general: R2 [(11-p)B', D (11-q)F D'] R2
+13,16,17  algorithm: R2 B [B 2D B', 3U'] B' R2  general: R2 B [B (11-q)D B', (11-p)U'] B' R2
+13,16,18  algorithm: R2 [B 2D B', 3U'] R2  general: R2 [B (11-q)D B', (11-p)U'] R2
+13,16,19  algorithm: R2 B' [B 2D B', 3U'] B R2  general: R2 B' [B (11-q)D B', (11-p)U'] B R2
+13,16,20  algorithm: R2 B2 [B 2D B', 3U'] B2 R2  general: R2 B2 [B (11-q)D B', (11-p)U'] B2 R2
+13,16,21  algorithm: R' D' [D 2F D', 3B'] D R  general: R' D' [D (11-q)F D', (11-p)B'] D R
+13,16,22  algorithm: R' D2 [D 2F D', 3B'] D2 R  general: R' D2 [D (11-q)F D', (11-p)B'] D2 R
+13,16,23  algorithm: R' D [D 2F D', 3B'] D' R  general: R' D [D (11-q)F D', (11-p)B'] D' R
+13,16,24  algorithm: R' [D 2F D', 3B'] R  general: R' [D (11-q)F D', (11-p)B'] R
+13,17,18  algorithm: B' R' [3D', R 2U R'] R B  general: B' R' [(11-p)D', R (11-q)U R'] R B
+13,17,20  algorithm: R' [R 2U R', 3D'] R  general: R' [R (11-q)U R', (11-p)D'] R
+13,18,19  algorithm: B2 R' [3D', R 2U R'] R B2  general: B2 R' [(11-p)D', R (11-q)U R'] R B2
+13,19,20  algorithm: B  R' [3D', R 2U R'] R B'  general: B  R' [(11-p)D', R (11-q)U R'] R B'
+13,21,22  algorithm: D [3F', R 2B R'] D'  general: D [(11-p)F', R (11-q)B R'] D'
+13,21,24  algorithm: D2 [R 2B R', 3F'] D2  general: D2 [R (11-q)B R', (11-p)F'] D2
+13,22,23  algorithm: [3F', R 2B R']  general: [(11-p)F', R (11-q)B R']
+13,23,24  algorithm: D' [3F', R 2B R'] D  general: D' [(11-p)F', R (11-q)B R'] D
+14,15,17  algorithm: B [3U', B 2D B'] B'  general: B [(11-p)U', B (11-q)D B'] B'
+14,15,18  algorithm: [3U', B 2D B']  general: [(11-p)U', B (11-q)D B']
+14,15,19  algorithm: B' [3U', B 2D B'] B  general: B' [(11-p)U', B (11-q)D B'] B
+14,15,20  algorithm: B2 [3U', B 2D B'] B2  general: B2 [(11-p)U', B (11-q)D B'] B2
+14,15,21  algorithm: R  D' [3B', D 2F D'] D R'  general: R  D' [(11-p)B', D (11-q)F D'] D R'
+14,15,22  algorithm: R  D2 [3B', D 2F D'] D2 R'  general: R  D2 [(11-p)B', D (11-q)F D'] D2 R'
+14,15,23  algorithm: R  D [3B', D 2F D'] D' R'  general: R  D [(11-p)B', D (11-q)F D'] D' R'
+14,15,24  algorithm: R [3B', D 2F D'] R'  general: R [(11-p)B', D (11-q)F D'] R'
+14,17,18  algorithm: B' R2 [3D', R 2U R'] R2 B  general: B' R2 [(11-p)D', R (11-q)U R'] R2 B
+14,17,20  algorithm: R2 [R 2U R', 3D'] R2  general: R2 [R (11-q)U R', (11-p)D'] R2
+14,18,19  algorithm: B2 R2 [3D', R 2U R'] R2 B2  general: B2 R2 [(11-p)D', R (11-q)U R'] R2 B2
+14,19,20  algorithm: B  R2 [3D', R 2U R'] R2 B'  general: B  R2 [(11-p)D', R (11-q)U R'] R2 B'
+14,21,22  algorithm: D  R' [3F', R 2B R'] R D'  general: D  R' [(11-p)F', R (11-q)B R'] R D'
+14,21,24  algorithm: D2 R' [R 2B R', 3F'] R D2  general: D2 R' [R (11-q)B R', (11-p)F'] R D2
+14,22,23  algorithm: R' [3F', R 2B R'] R  general: R' [(11-p)F', R (11-q)B R'] R
+14,23,24  algorithm: D' R' [3F', R 2B R'] R D  general: D' R' [(11-p)F', R (11-q)B R'] R D
+15,16,17  algorithm: R' B [3U', B 2D B'] B' R  general: R' B [(11-p)U', B (11-q)D B'] B' R
+15,16,18  algorithm: R' [3U', B 2D B'] R  general: R' [(11-p)U', B (11-q)D B'] R
+15,16,19  algorithm: R' B' [3U', B 2D B'] B R  general: R' B' [(11-p)U', B (11-q)D B'] B R
+15,16,20  algorithm: R' B2 [3U', B 2D B'] B2 R  general: R' B2 [(11-p)U', B (11-q)D B'] B2 R
+15,16,21  algorithm: D' [3B', D 2F D'] D  general: D' [(11-p)B', D (11-q)F D'] D
+15,16,22  algorithm: D2 [3B', D 2F D'] D2  general: D2 [(11-p)B', D (11-q)F D'] D2
+15,16,23  algorithm: D [3B', D 2F D'] D'  general: D [(11-p)B', D (11-q)F D'] D'
+15,16,24  algorithm: [3B', D 2F D']  general: [(11-p)B', D (11-q)F D']
+15,17,18  algorithm: B' R [3D', R 2U R'] R' B  general: B' R [(11-p)D', R (11-q)U R'] R' B
+15,17,20  algorithm: R [R 2U R', 3D'] R'  general: R [R (11-q)U R', (11-p)D'] R'
+15,18,19  algorithm: B2 R [3D', R 2U R'] R' B2  general: B2 R [(11-p)D', R (11-q)U R'] R' B2
+15,19,20  algorithm: B  R [3D', R 2U R'] R' B'  general: B  R [(11-p)D', R (11-q)U R'] R' B'
+15,21,22  algorithm: D  R2 [3F', R 2B R'] R2 D'  general: D  R2 [(11-p)F', R (11-q)B R'] R2 D'
+15,21,24  algorithm: D2 R2 [R 2B R', 3F'] R2 D2  general: D2 R2 [R (11-q)B R', (11-p)F'] R2 D2
+15,22,23  algorithm: R2 [3F', R 2B R'] R2  general: R2 [(11-p)F', R (11-q)B R'] R2
+15,23,24  algorithm: D' R2 [3F', R 2B R'] R2 D  general: D' R2 [(11-p)F', R (11-q)B R'] R2 D
+16,17,18  algorithm: B' [3D', R 2U R'] B  general: B' [(11-p)D', R (11-q)U R'] B
+16,17,20  algorithm: [R 2U R', 3D']  general: [R (11-q)U R', (11-p)D']
+16,18,19  algorithm: B2 [3D', R 2U R'] B2  general: B2 [(11-p)D', R (11-q)U R'] B2
+16,19,20  algorithm: B [3D', R 2U R'] B'  general: B [(11-p)D', R (11-q)U R'] B'
+16,21,22  algorithm: D  R [3F', R 2B R'] R' D'  general: D  R [(11-p)F', R (11-q)B R'] R' D'
+16,21,24  algorithm: D2 R [R 2B R', 3F'] R' D2  general: D2 R [R (11-q)B R', (11-p)F'] R' D2
+16,22,23  algorithm: R [3F', R 2B R'] R'  general: R [(11-p)F', R (11-q)B R'] R'
+16,23,24  algorithm: D' R [3F', R 2B R'] R' D  general: D' R [(11-p)F', R (11-q)B R'] R' D
+17,18,21  algorithm: B2 [3L', D 2R D'] B2  general: B2 [(11-p)L', D (11-q)R D'] B2
+17,18,22  algorithm: B2 D' [3L', D 2R D'] D B2  general: B2 D' [(11-p)L', D (11-q)R D'] D B2
+17,18,23  algorithm: B2 D2 [3L', D 2R D'] D2 B2  general: B2 D2 [(11-p)L', D (11-q)R D'] D2 B2
+17,18,24  algorithm: B2 D [3L', D 2R D'] D' B2  general: B2 D [(11-p)L', D (11-q)R D'] D' B2
+17,20,21  algorithm: B' [D 2R D', 3L'] B  general: B' [D (11-q)R D', (11-p)L'] B
+17,20,22  algorithm: B' D' [D 2R D', 3L'] D B  general: B' D' [D (11-q)R D', (11-p)L'] D B
+17,20,23  algorithm: B' D2 [D 2R D', 3L'] D2 B  general: B' D2 [D (11-q)R D', (11-p)L'] D2 B
+17,20,24  algorithm: B' D [D 2R D', 3L'] D' B  general: B' D [D (11-q)R D', (11-p)L'] D' B
+17,21,22  algorithm: D2 [3R', B 2L B'] D2  general: D2 [(11-p)R', B (11-q)L B'] D2
+17,21,24  algorithm: D' [B 2L B', 3R'] D  general: D' [B (11-q)L B', (11-p)R'] D
+17,22,23  algorithm: D [3R', B 2L B'] D'  general: D [(11-p)R', B (11-q)L B'] D'
+17,23,24  algorithm: [3R', B 2L B']  general: [(11-p)R', B (11-q)L B']
+18,19,21  algorithm: B [3L', D 2R D'] B'  general: B [(11-p)L', D (11-q)R D'] B'
+18,19,22  algorithm: B  D' [3L', D 2R D'] D B'  general: B  D' [(11-p)L', D (11-q)R D'] D B'
+18,19,23  algorithm: B  D2 [3L', D 2R D'] D2 B'  general: B  D2 [(11-p)L', D (11-q)R D'] D2 B'
+18,19,24  algorithm: B  D [3L', D 2R D'] D' B'  general: B  D [(11-p)L', D (11-q)R D'] D' B'
+18,21,22  algorithm: D2 B' [3R', B 2L B'] B D2  general: D2 B' [(11-p)R', B (11-q)L B'] B D2
+18,21,24  algorithm: D' B' [B 2L B', 3R'] B D  general: D' B' [B (11-q)L B', (11-p)R'] B D
+18,22,23  algorithm: D  B' [3R', B 2L B'] B D'  general: D  B' [(11-p)R', B (11-q)L B'] B D'
+18,23,24  algorithm: B' [3R', B 2L B'] B  general: B' [(11-p)R', B (11-q)L B'] B
+19,20,21  algorithm: [3L', D 2R D']  general: [(11-p)L', D (11-q)R D']
+19,20,22  algorithm: D' [3L', D 2R D'] D  general: D' [(11-p)L', D (11-q)R D'] D
+19,20,23  algorithm: D2 [3L', D 2R D'] D2  general: D2 [(11-p)L', D (11-q)R D'] D2
+19,20,24  algorithm: D [3L', D 2R D'] D'  general: D [(11-p)L', D (11-q)R D'] D'
+19,21,22  algorithm: D2 B2 [3R', B 2L B'] B2 D2  general: D2 B2 [(11-p)R', B (11-q)L B'] B2 D2
+19,21,24  algorithm: D' B2 [B 2L B', 3R'] B2 D  general: D' B2 [B (11-q)L B', (11-p)R'] B2 D
+19,22,23  algorithm: D  B2 [3R', B 2L B'] B2 D'  general: D  B2 [(11-p)R', B (11-q)L B'] B2 D'
+19,23,24  algorithm: B2 [3R', B 2L B'] B2  general: B2 [(11-p)R', B (11-q)L B'] B2
+20,21,22  algorithm: D2 B [3R', B 2L B'] B' D2  general: D2 B [(11-p)R', B (11-q)L B'] B' D2
+20,21,24  algorithm: D' B [B 2L B', 3R'] B' D  general: D' B [B (11-q)L B', (11-p)R'] B' D
+20,22,23  algorithm: D  B [3R', B 2L B'] B' D'  general: D  B [(11-p)R', B (11-q)L B'] B' D'
+20,23,24  algorithm: B [3R', B 2L B'] B'  general: B [(11-p)R', B (11-q)L B'] B'

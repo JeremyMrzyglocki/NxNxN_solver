@@ -11,6 +11,10 @@
 #include <array>
 #include <iomanip>
 #include <sstream>
+#include <climits>
+#include <unordered_map>
+#include <set>
+#include <tuple>
 
 using namespace std;
 
@@ -21,6 +25,29 @@ vector<vector<int>> layer_2;
 vector<vector<int>> layer_3;
 vector<vector<int>> layer_4;
 vector<vector<int>> layer_5;
+
+vector<vector<int>> layer_1_b, layer_2_b, layer_3_b, layer_4_b, layer_5_b;
+
+
+inline void add_cycle_deferred(int a, int b, int c, int d, int e, int layer) {
+    if (layer == 1)      layer_1_b.push_back({a,b,c,d,e});
+    else if (layer == 2) layer_2_b.push_back({a,b,c,d,e});
+    else if (layer == 3) layer_3_b.push_back({a,b,c,d,e});
+    else if (layer == 4) layer_4_b.push_back({a,b,c,d,e});
+    else if (layer == 5) layer_5_b.push_back({a,b,c,d,e});
+}
+
+
+static inline bool should_defer(int a, int b, int c, int face1, int face2, int layer) {
+    // 1) Local check (1..8)
+    // Example sets (fill with the cases you want to defer)
+static const set<tuple<int,int,int>> LOCAL_TRIPLES_TO_DEFER = {
+    /* e.g. make (1,2,3) defer regardless of faces/layer: */ {4,8,7},{4,7,8},{2,6,7},{4,5,8},{2,8,3},{2,7,1}
+};
+    if (LOCAL_TRIPLES_TO_DEFER.count({a,b,c})) return true;
+    return false;
+}
+
 
 
 inline void add_cycle(int a, int b, int c, int d, int e, int layer) { // d and e are the face-indices
@@ -565,7 +592,7 @@ static vector<CsvSequence> parse_sequences_cell(const string& cellRaw) {
 }
 
 // Load once (lazily) from a file you can configure here:
-static const char* kPatternCSV = "cycle_tables.csv";
+static const char* kPatternCSV = "cycle_tables_v2.csv";
 
 static void load_pattern_table_once() {
     if (g_table_loaded) return;
@@ -624,160 +651,18 @@ static const CsvSequence* pick_sequence_for_pattern(const string& pattern) { // 
     return &it->second.front(); // fallback
 }
 
-// Alternative: more complex selection strategy based on cycle frequencies.
-
-
-// static const CsvSequence* pick_sequence_for_pattern(const std::string& pattern) { // option2
-//     ++g_patterns_looked_this_run;
-//     load_pattern_table_once();
-
-//     auto it = g_sequences_by_pattern.find(pattern);
-//     if (it == g_sequences_by_pattern.end() || it->second.empty()) {
-//         ++g_patterns_missing_this_run;
-//         return nullptr;
-//     }
-
-//     // Compute min length as before
-//     int minL = INT_MAX;
-//     auto itMin = g_minlen_by_pattern.find(pattern);
-//     if (itMin != g_minlen_by_pattern.end() && itMin->second > 0) {
-//         minL = itMin->second;
-//     } else {
-//         for (auto& s : it->second) minL = std::min<int>(minL, (int)s.size());
-//         if (minL == INT_MAX) minL = 0;
-//     }
-
-//     // Helper: total frequency of a cycle across all layers
-//     auto cycle_freq = [](int a, int b, int c) -> long long {
-//         std::string key = "(" + std::to_string(a) + "," + std::to_string(b) + "," + std::to_string(c) + ")";
-//         long long tot = 0;
-//         for (int L = 1; L <= 10; ++L) {
-//             auto itLayer = G_cycle_hist_by_layer[L].find(key);
-//             if (itLayer != G_cycle_hist_by_layer[L].end()) tot += itLayer->second;
-//         }
-//         return tot;
-//     };
-
-//     // Score: sum of cycle frequencies (log1p to soften very large counts)
-//     auto score_seq = [&](const CsvSequence& seq) -> double {
-//         double s = 0.0;
-//         for (const auto& c : seq) {
-//             long long f = cycle_freq(c.a, c.b, c.c);
-//             s += std::log1p((double)f);
-//         }
-//         return s;
-//     };
-
-//     const CsvSequence* best = nullptr;
-//     double bestScore = -1e300;
-
-//     for (auto& s : it->second) {
-//         if ((int)s.size() != minL) continue;      // keep strict min-length
-//         double sc = score_seq(s);
-//         // tie-break: higher score, then lexicographically first (stable fallback)
-//         if (sc > bestScore) { bestScore = sc; best = &s; }
-//     }
-
-//     if (!best) best = &it->second.front();        // fallback
-
-//     ++g_patterns_used_this_run;
-//     ++G_pattern_hist[pattern];
-//     return best;
-// }
-
-
-// static const CsvSequence* pick_sequence_for_pattern(const std::string& pattern) { // option3
-//     ++g_patterns_looked_this_run;
-//     load_pattern_table_once();
-
-//     auto it = g_sequences_by_pattern.find(pattern);
-//     if (it == g_sequences_by_pattern.end() || it->second.empty()) {
-//         ++g_patterns_missing_this_run;
-//         return nullptr;
-//     }
-
-//     // As before, compute min length for reference
-//     int minL = INT_MAX;
-//     auto itMin = g_minlen_by_pattern.find(pattern);
-//     if (itMin != g_minlen_by_pattern.end() && itMin->second > 0) {
-//         minL = itMin->second;
-//     } else {
-//         for (auto& s : it->second) minL = std::min<int>(minL, (int)s.size());
-//         if (minL == INT_MAX) minL = 0;
-//     }
-
-//     // Pull total cycle frequency across layers
-//     auto cycle_freq = [](int a, int b, int c) -> long long {
-//         std::string key = "(" + std::to_string(a) + "," + std::to_string(b) + "," + std::to_string(c) + ")";
-//         long long tot = 0;
-//         for (int L = 1; L <= 10; ++L) {
-//             auto itLayer = G_cycle_hist_by_layer[L].find(key);
-//             if (itLayer != G_cycle_hist_by_layer[L].end()) tot += itLayer->second;
-//         }
-//         return tot;
-//     };
-
-//     // Scoring:
-//     //  - Base: sum(log1p(freq(cycle)))
-//     //  - Bigram bonus: sum over adjacent cycles of sqrt(freq_i * freq_j)
-//     //  - Length penalty: lambda * (len - minL)
-//     constexpr double LAMBDA_LEN = 0.15;  // adjust to taste
-//     constexpr double BIGRAM_W   = 0.15;  // weight of pair synergy
-
-//     auto score_seq = [&](const CsvSequence& seq) -> double {
-//         if (seq.empty()) return -1e300;
-//         std::vector<double> f; f.reserve(seq.size());
-//         for (const auto& c : seq) f.push_back(std::log1p((double)cycle_freq(c.a,c.b,c.c)));
-
-//         double s = 0.0;
-//         for (double x : f) s += x;
-
-//         // bigram synergy (alpha -> beta)
-//         for (size_t i = 1; i < f.size(); ++i) {
-//             // Use geometric mean of underlying (non-log) freqs as a proxy
-//             long long fi_raw = std::max(0LL, (long long)std::round(std::expm1(f[i-1])));
-//             long long fj_raw = std::max(0LL, (long long)std::round(std::expm1(f[i])));
-//             s += BIGRAM_W * std::sqrt((double)fi_raw * (double)fj_raw);
-//         }
-
-//         // penalize being longer than min
-//         s -= LAMBDA_LEN * std::max<int>(0, (int)seq.size() - minL);
-//         return s;
-//     };
-
-//     const CsvSequence* best = nullptr;
-//     double bestScore = -1e300;
-
-//     // Consider ALL candidate sequences (not only min length).
-//     for (auto& s : it->second) {
-//         double sc = score_seq(s);
-//         if (sc > bestScore) { bestScore = sc; best = &s; }
-//     }
-
-//     if (!best) best = &it->second.front(); // ultra-safe fallback
-
-//     ++g_patterns_used_this_run;
-//     ++G_pattern_hist[pattern];
-//     return best;
-// }
-
-
-// END FOR READING
-
-
 void mapping_into_3cycles(const string& pattern, int face1, int face2, int layer) {
     const CsvSequence* seq = pick_sequence_for_pattern(pattern);
-    if (!seq) {
-        // Nothing known for this pattern — do nothing (or log).
-        // cerr << "[mapping_into_3cycles] No sequence for pattern " << pattern << "\n";
-        return;
-    }
+    if (!seq) return;
+
     for (const auto& cyc : *seq) {
-        add_cycle(cyc.a, cyc.b, cyc.c, face1, face2, layer);
+        if (should_defer(cyc.a, cyc.b, cyc.c, face1, face2, layer)) {
+            add_cycle_deferred(cyc.a, cyc.b, cyc.c, face1, face2, layer);
+        } else {
+            add_cycle        (cyc.a, cyc.b, cyc.c, face1, face2, layer);
+        }
     }
 }
-
-
 
 
 int mapPos(int pos1to8, int face1, int face2) { // Map a position 1..8 to an index in the 24-char state string,
@@ -834,94 +719,143 @@ void sorting_via_sorting_network(string state){
     print_state(state);
     cout << endl;
 
-cout << endl << "Layer 1:" << endl;
-layer_1.clear();
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 4), 0, 4, 1);  // (0,5) → (0,4)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 1);  // (1,3) → (1,2)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 3), 5, 3, 1);  // (2,4) → (5,3)
+    layer_1.clear(); layer_1_b.clear();
+    layer_2.clear(); layer_2_b.clear();
+    layer_3.clear(); layer_3_b.clear();
+    layer_4.clear(); layer_4_b.clear();
+    layer_5.clear(); layer_5_b.clear();
 
-for (const auto& cyc : layer_1)
-    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
-         << cyc[3] << " and " << cyc[4] << "" << endl;
-cout << endl;
-apply_cycles(state, layer_1);
-print_state(state);
+    cout << endl << "Layer 1:" << endl;
+    layer_1.clear();
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 4), 0, 4, 1);  // (0,5) → (0,4)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 2), 1, 2, 1);  // (1,3) → (1,2)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 3), 5, 3, 1);  // (2,4) → (5,3)
 
+    for (const auto& cyc : layer_1)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_1);
+    print_state(state);
 
+    // Wave 1b (deferred)
+    cout << "\n\nWave 1b (deferred):\n";
+    for (const auto& cyc : layer_1_b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "\n";
+    cout << endl;
+    apply_cycles(state, layer_1_b);
+    print_state(state);
 
-cout << endl << endl << "Layer 2:" << endl;
-layer_2.clear();   
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 5), 1, 5, 2);  // (1,2) → (1,5)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 2);  // (3,4) → (2,3)
-
-for (const auto& cyc : layer_2)
-    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
-         << cyc[3] << " and " << cyc[4] << "" << endl;
-cout << endl;
-apply_cycles(state, layer_2);
-print_state(state);
-
-
-
-cout << endl <<  endl << "Layer 3:" << endl;
-layer_3.clear();  
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 2), 0, 2, 3);  // (0,3) → (0,2)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 4), 5, 4, 3);  // (2,5) → (5,4)
-
-for (const auto& cyc : layer_3)
-    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
-         << cyc[3] << " and " << cyc[4] << "" << endl;
-cout << endl;
-apply_cycles(state, layer_3);
-print_state(state);
+    cout << endl << endl << "Layer 2:" << endl;
+    layer_2.clear();   
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 5), 1, 5, 2);  // (1,2) → (1,5)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 2);  // (3,4) → (2,3)
 
 
+    for (const auto& cyc : layer_2)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_2);
+    print_state(state);
 
-cout << endl <<  endl << "Layer 4:" << endl;
-layer_4.clear();  
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 1), 0, 1, 4);  // (0,1) → (0,1)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 2), 5, 2, 4);  // (2,3) → (5,2)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 4);  // (4,5) → (3,4)
-
-for (const auto& cyc : layer_4)
-    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
-         << cyc[3] << " and " << cyc[4] << "" << endl;
-cout << endl;
-apply_cycles(state, layer_4);
-print_state(state);
-
-
-
-cout << endl <<  endl << "Layer 5:" << endl;
-layer_5.clear(); 
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 5), 1, 5, 5);  // (1,2) → (1,5)
-mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 5);  // (3,4) → (2,3)
-
-for (const auto& cyc : layer_5)
-    cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
-         << cyc[3] << " and " << cyc[4] << "" << endl;
-cout << endl;
-apply_cycles(state, layer_5);
-print_state(state);
-cout << endl;
+    // Wave 2b (deferred)
+    cout << "\n\nWave 2b (deferred):\n";
+    for (const auto& cyc : layer_2_b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "\n";
+    cout << endl;
+    apply_cycles(state, layer_2_b);
+    print_state(state);
 
 
-}
+    cout << endl <<  endl << "Layer 3:" << endl;
+    layer_3.clear();  
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 2), 0, 2, 3);  // (0,3) → (0,2)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 4), 5, 4, 3);  // (2,5) → (5,4)
+
+    for (const auto& cyc : layer_3)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_3);
+    print_state(state);
+
+    // Wave 3b (deferred)
+    cout << "\n\nWave 3b (deferred):\n";
+    for (const auto& cyc : layer_3_b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "\n";
+    cout << endl;
+    apply_cycles(state, layer_3_b);
+    print_state(state);
+
+    cout << endl <<  endl << "Layer 4:" << endl;
+    layer_4.clear();  
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 0, 1), 0, 1, 4);  // (0,1) → (0,1)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 5, 2), 5, 2, 4);  // (2,3) → (5,2)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 3, 4), 3, 4, 4);  // (4,5) → (3,4)
+
+    for (const auto& cyc : layer_4)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_4);
+    print_state(state);
+
+    // Wave 4b (deferred)
+    cout << "\n\nWave 4b (deferred):\n";
+    for (const auto& cyc : layer_4_b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "\n";
+    cout << endl;
+    apply_cycles(state, layer_4_b);
+    print_state(state);
+
+    cout << endl <<  endl << "Layer 5:" << endl;
+    layer_5.clear(); 
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 1, 5), 1, 5, 5);  // (1,2) → (1,5)
+    mapping_into_3cycles(compute_face_swap_full_orbit(state, 2, 3), 2, 3, 5);  // (3,4) → (2,3)
+
+    for (const auto& cyc : layer_5)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "" << endl;
+    cout << endl;
+    apply_cycles(state, layer_5);
+    print_state(state);
+    cout << endl;
 
 
-static inline int abs1_index(int p, int f1, int f2) {
-    // Map local 1..8 (over faces f1,f2) -> absolute 1-based index in 24-array
-    return (p <= 4) ? (p + 4*f1) : (p + (4*f2 - 4));
-}
+    // Wave 5b (deferred)
+    cout << "\n\nWave 5b (deferred):\n";
+    for (const auto& cyc : layer_5_b)
+        cout << "cycle(" << cyc[0] << "," << cyc[1] << ","  << cyc[2] << ") in blocks " 
+            << cyc[3] << " and " << cyc[4] << "\n";
+    cout << endl;
+    apply_cycles(state, layer_5_b);
+    print_state(state);
+    }
 
+    static inline int abs1_index(int p, int f1, int f2) {
+        // Map local 1..8 (over faces f1,f2) -> absolute 1-based index in 24-array
+        return (p <= 4) ? (p + 4*f1) : (p + (4*f2 - 4));
+    }
+    
 void translate_and_flush_into_file(int orbit1, int orbit2, const std::string& outdir) {
-    std::ofstream o1 (outdir + "/cycles_wave1.txt", std::ios::app);
-    std::ofstream o2 (outdir + "/cycles_wave2.txt", std::ios::app);
-    std::ofstream o3 (outdir + "/cycles_wave3.txt", std::ios::app);
-    std::ofstream o4 (outdir + "/cycles_wave4.txt", std::ios::app);
-    std::ofstream o5 (outdir + "/cycles_wave5.txt", std::ios::app);
+    ofstream o2 (outdir + "/cycles_wave3.txt",  std::ios::app);
+    ofstream o1 (outdir + "/cycles_wave1.txt",  std::ios::app);
+    ofstream o3 (outdir + "/cycles_wave5.txt",  std::ios::app);
+    ofstream o4 (outdir + "/cycles_wave7.txt",  std::ios::app);
+    ofstream o5 (outdir + "/cycles_wave9.txt",  std::ios::app);
 
-    auto emit_layer = [&](std::ofstream& out, const std::vector<std::vector<int>>& L) {
+    ofstream o1b(outdir + "/cycles_wave2.txt", std::ios::app);
+    ofstream o2b(outdir + "/cycles_wave4.txt", std::ios::app);
+    ofstream o3b(outdir + "/cycles_wave6.txt", std::ios::app);
+    ofstream o4b(outdir + "/cycles_wave8.txt", std::ios::app);
+    ofstream o5b(outdir + "/cycles_wave10.txt", std::ios::app);
+
+    auto emit_layer = [&](ofstream& out, const vector<std::vector<int>>& L) {
         for (const auto& cyc : L) {
             int f1 = cyc[3], f2 = cyc[4];
             int p1 = abs1_index(cyc[0], f1, f2);
@@ -932,13 +866,20 @@ void translate_and_flush_into_file(int orbit1, int orbit2, const std::string& ou
         }
     };
 
+    // Wave “a”
     emit_layer(o1, layer_1);
     emit_layer(o2, layer_2);
     emit_layer(o3, layer_3);
     emit_layer(o4, layer_4);
     emit_layer(o5, layer_5);
-}
 
+    // Wave “b” (deferred)
+    emit_layer(o1b, layer_1_b);
+    emit_layer(o2b, layer_2_b);
+    emit_layer(o3b, layer_3_b);
+    emit_layer(o4b, layer_4_b);
+    emit_layer(o5b, layer_5_b);
+}
 
 
 // int main() {
